@@ -35,7 +35,6 @@ class TrackFragment :
         super.onViewCreated(view, savedInstanceState)
 
         val listItem= mutableListOf<RecyclerViewItem>()
-
         listItem.addAll(getTrack())
         binding.rvAllMusic.apply {
             adapter= AllMusicRvAdapter(listItem)

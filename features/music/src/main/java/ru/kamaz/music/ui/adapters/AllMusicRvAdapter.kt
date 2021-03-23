@@ -29,6 +29,7 @@ class AllMusicRvAdapter(private val item: List<RecyclerViewItem>) :
 
         }
 
+
     }
 
     override fun getItemCount() = item.size

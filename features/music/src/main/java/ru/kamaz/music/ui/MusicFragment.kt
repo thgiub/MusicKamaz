@@ -21,5 +21,19 @@ class MusicFragment :
             viewModel = this@MusicFragment.viewModel
         }
 
+    override fun setListeners() {
+        binding.icPlay.setOnClickListener {
+            viewModel.playOrPause()
+        }
+        binding.rotate.setOnClickListener {
+            viewModel.startTrack()
+        }
+        binding.nextButton.setOnClickListener {
+            viewModel.nextTrack()
+        }
+
+        super.setListeners()
     }
+
+}
 
