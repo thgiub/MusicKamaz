@@ -22,11 +22,10 @@ class MusicFragmentViewModel @Inject constructor(
 ) : BaseViewModel(application),MediaPlayer.OnCompletionListener {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
-    private var mediaPlayer: MediaPlayer = MediaPlayer()
-
+    private var mediaPlayer: MediaPlayer= MediaPlayer()
 
     override fun onDestroy() {
-        mediaPlayer.release()
+        mediaPlayer?.release()
         super.onDestroy()
     }
 
@@ -77,7 +76,6 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun resume() {
-
        mediaPlayer.start()
     }
 
