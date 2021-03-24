@@ -32,6 +32,10 @@ class MusicFragment :
             viewModel.nextTrack()
         }
 
+        binding.prevButton.setOnClickListener {
+            viewModel.previousTrack()
+        }
+
         super.setListeners()
     }
 

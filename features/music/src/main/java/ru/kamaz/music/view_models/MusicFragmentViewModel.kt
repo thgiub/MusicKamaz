@@ -22,44 +22,42 @@ class MusicFragmentViewModel @Inject constructor(
 ) : BaseViewModel(application),MediaPlayer.OnCompletionListener {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
-    private var mediaPlayer: MediaPlayer= MediaPlayer()
+   private val mediaPlayer: MediaPlayer= MediaPlayer()
 
     override fun onDestroy() {
-        mediaPlayer?.release()
+        mediaPlayer.release()
         super.onDestroy()
     }
-
-
     override fun init() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
 
-
+        mediaPlayer.setOnCompletionListener(this)
+        mediaPlayer.setAudioAttributes(audioAttributes)
         super.init()
     }
-
     override fun onCreate() {
         updateTracks(mediaManager)
         super.onCreate()
     }
 
     fun startTrack(){
-
+        updateTracks(mediaManager)
         val id: Long = tracks[currentTrackPosition].id
         val myUri: Uri = ContentUris.withAppendedId(
             android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             id
         )
 
-        val mediaPlayer = MediaPlayer().apply {
+        mediaPlayer.apply {
             stop()
             reset()
             setDataSource(context, myUri)
             prepare()
-            start()
         }
+    mediaPlayer.start()
     }
     fun isPlaying(): Boolean = mediaPlayer.isPlaying
 
@@ -72,7 +70,6 @@ class MusicFragmentViewModel @Inject constructor(
 
     fun pause() {
         mediaPlayer.pause()
-
     }
 
     fun resume() {
@@ -97,7 +94,6 @@ class MusicFragmentViewModel @Inject constructor(
         startTrack()
     }
 
-
     fun randomSong() {
         mediaPlayer.apply {
             stop()
@@ -115,7 +111,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
-        TODO("Not yet implemented")
+        nextTrack()
     }
 
 
