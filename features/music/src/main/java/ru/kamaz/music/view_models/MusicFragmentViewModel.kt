@@ -5,24 +5,27 @@ import android.content.ContentUris
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Environment
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import ru.kamaz.music.date.media.MediaManager
-import ru.kamaz.music.date.media.model.Track
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music_api.interactor.LoadData
+import ru.kamaz.music_api.models.Track
+import ru.sir.core.Either
+import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
-import java.lang.Exception
 import javax.inject.Inject
 
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
+    private val loadData: LoadData,
     private val mediaManager: MediaManager
 ) : BaseViewModel(application),MediaPlayer.OnCompletionListener {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
-   private val mediaPlayer: MediaPlayer= MediaPlayer()
+   private val mediaPlayer: MediaPlayer = MediaPlayer()
+
+    private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
+    val isPlaying = _isPlaying.asStateFlow()
 
     override fun onDestroy() {
         mediaPlayer.release()
@@ -33,7 +36,6 @@ class MusicFragmentViewModel @Inject constructor(
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
-
         mediaPlayer.setOnCompletionListener(this)
         mediaPlayer.setAudioAttributes(audioAttributes)
         super.init()
@@ -42,7 +44,6 @@ class MusicFragmentViewModel @Inject constructor(
         updateTracks(mediaManager)
         super.onCreate()
     }
-
     fun startTrack(){
         updateTracks(mediaManager)
         val id: Long = tracks[currentTrackPosition].id
@@ -50,29 +51,28 @@ class MusicFragmentViewModel @Inject constructor(
             android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             id
         )
-
         mediaPlayer.apply {
             stop()
             reset()
             setDataSource(context, myUri)
             prepare()
         }
-    mediaPlayer.start()
     }
-    fun isPlaying(): Boolean = mediaPlayer.isPlaying
 
     fun playOrPause() {
-        when(isPlaying()) {
+        when(isPlaying.value) {
             true -> pause()
             false -> resume()
         }
     }
 
     fun pause() {
+        _isPlaying.value = false
         mediaPlayer.pause()
     }
 
     fun resume() {
+        _isPlaying.value = true
        mediaPlayer.start()
     }
 
@@ -83,7 +83,9 @@ class MusicFragmentViewModel @Inject constructor(
             else -> currentTrackPosition++
         }
         startTrack()
-
+        when (isPlaying.value ){
+            true-> mediaPlayer.start()
+        }
     }
 
     fun nextTrack() {
@@ -92,27 +94,31 @@ class MusicFragmentViewModel @Inject constructor(
             else -> currentTrackPosition--
         }
         startTrack()
-    }
-
-    fun randomSong() {
-        mediaPlayer.apply {
-            stop()
-            reset()
-            setDataSource(tracks[currentPosition].data)
-            prepare()
-            start()
-
+        when (isPlaying.value ){
+            true-> mediaPlayer.start()
         }
 
+
+
     }
 
+    fun updateTrackInfo(track:Track){
+
+    }
+
+
+
     fun updateTracks(mediaManager: MediaManager) {
-        tracks = mediaManager.scanTracks()
+        val result = mediaManager.scanTracks()
+        if (result is Either.Right) {
+            tracks.addAll(result.r)
+        }
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
         nextTrack()
     }
+
 
 
 }

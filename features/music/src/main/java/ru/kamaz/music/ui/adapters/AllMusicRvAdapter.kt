@@ -5,9 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.kamaz.itis.phoneapp.ui.pojo.RecyclerViewItem
-import ru.kamaz.itis.phoneapp.ui.pojo.SongItem
 import ru.kamaz.music.databinding.TestTextItemBinding
-import ru.kamaz.music.date.media.model.Track
+import ru.kamaz.music_api.models.Track
 
 class AllMusicRvAdapter(private val item: List<RecyclerViewItem>) :
     RecyclerView.Adapter<AllMusicRvAdapter.MyViewHolder>() {
@@ -31,14 +30,12 @@ class AllMusicRvAdapter(private val item: List<RecyclerViewItem>) :
 
 
     }
-
     override fun getItemCount() = item.size
-
 
     class MyViewHolder(private val binding2: TestTextItemBinding) :
         RecyclerView.ViewHolder(binding2.root), View.OnClickListener {
 
-        fun bind(item: Track) {
+        fun bind(item:Track) {
 
             binding2.musicName.text=item.title
             binding2.artistName.text= item.artist

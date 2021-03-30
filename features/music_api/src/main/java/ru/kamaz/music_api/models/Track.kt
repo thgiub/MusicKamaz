@@ -1,4 +1,4 @@
-package ru.kamaz.music.date.media.model
+package ru.kamaz.music_api.models
 
 import java.io.Serializable
 

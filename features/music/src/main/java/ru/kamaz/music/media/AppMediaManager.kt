@@ -1,17 +1,20 @@
- package ru.kamaz.music.date.media
+ package ru.kamaz.music.media
 
 import android.content.Context
 import android.provider.MediaStore
-import ru.kamaz.music.date.media.model.Track
+import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music_api.models.Track
+import ru.sir.core.Either
+import ru.sir.core.None
 import javax.inject.Inject
 
 class AppMediaManager  @Inject constructor( val context: Context)
     : MediaManager {
 
-    override fun scanTracks(): ArrayList<Track> {
+    override fun scanTracks():Either<None,List<Track>> {
         val array = ArrayList<Track>()
 
-        val uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -39,12 +42,21 @@ class AppMediaManager  @Inject constructor( val context: Context)
 
                 cursor.moveToNext()
 
-                array.add(Track(id, title, artist, data, duration, albumId))
+                array.add(
+                    Track(
+                        id,
+                        title,
+                        artist,
+                        data,
+                        duration,
+                        albumId
+                    )
+                )
             }
 
             cursor.close()
         }
 
-        return array
+        return Either.Right(array)
     }
 }

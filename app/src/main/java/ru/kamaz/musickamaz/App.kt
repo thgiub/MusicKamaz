@@ -18,6 +18,7 @@ class App : BaseApplication() {
     override fun provideComponent(type: Class<out BaseDaggerComponent>): BaseDaggerComponent {
         return when(type){
             MusicComponent::class.java -> appComponent.createMusicComponent().create(CacheModule(this))
+
             else -> throw IllegalArgumentException("rere $type")
         }
     }
