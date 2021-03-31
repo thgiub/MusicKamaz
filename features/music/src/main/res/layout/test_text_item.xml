@@ -3,54 +3,67 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="20dp"
+    android:background="@drawable/back_item"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="20dp">
 
     <ImageView
         android:id="@+id/micro_picture"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/korj"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/music_name"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/music_name"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-
-        app:layout_constraintEnd_toStartOf="@+id/like"
-        app:layout_constraintStart_toEndOf="@+id/micro_picture"
+        android:layout_height="50dp"
+        android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/artist_name"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/like"
+        app:layout_constraintHorizontal_weight="3"
+        app:layout_constraintStart_toEndOf="@+id/micro_picture"
+        app:layout_constraintTop_toTopOf="@+id/micro_picture"
+        android:layout_marginStart="20dp"/>
 
     <TextView
         android:id="@+id/artist_name"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toEndOf="@+id/micro_picture"
-        app:layout_constraintTop_toBottomOf="@+id/music_name"
-        app:layout_constraintEnd_toStartOf="@+id/like"
+        android:layout_height="50dp"
+        android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="@+id/micro_picture"
-    />
+        app:layout_constraintStart_toStartOf="@id/music_name"
+        app:layout_constraintTop_toBottomOf="@+id/music_name"
+        app:layout_constraintEnd_toEndOf="@id/music_name" />
+
     <ImageView
         android:id="@+id/like"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/music_name"
-        app:layout_constraintBottom_toBottomOf="@+id/micro_picture"
+        android:layout_height="100dp"
         android:src="@drawable/ic_star"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/settings"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/music_name"
         app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/settings"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="duration"
+        android:layout_height="100dp"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/ic_three_point"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/music_name"
-        app:layout_constraintBottom_toBottomOf="@+id/artist_name"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/like"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 

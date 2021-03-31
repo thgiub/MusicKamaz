@@ -39,7 +39,7 @@ class AllMusicRvAdapter(private val item: List<RecyclerViewItem>) :
 
             binding2.musicName.text=item.title
             binding2.artistName.text= item.artist
-            binding2.duration.text= item.duration
+            //binding2.duration.text= item.duration
         }
 
         override fun onClick(v: View?) {
