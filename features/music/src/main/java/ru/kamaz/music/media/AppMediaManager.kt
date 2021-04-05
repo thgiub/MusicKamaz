@@ -59,4 +59,24 @@ class AppMediaManager  @Inject constructor( val context: Context)
 
         return Either.Right(array)
     }
+
+    override fun getAlbumImagePath(albumID: Long): Either<None, String> {
+        val uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Audio.Albums.ALBUM_ART)
+        val selection = MediaStore.Audio.Albums._ID + "=?"
+        val args = arrayOf(albumID.toString())
+
+        val cursor = context.contentResolver.query(uri, projection, selection, args, null)
+
+        var albumPath: String? = null
+
+        if(cursor != null) {
+            if(cursor.moveToFirst()) albumPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
+        }
+
+        cursor?.close()
+
+        return if (albumPath == null) Either.Left(None()) else Either.Right(albumPath)
+    }
+
 }

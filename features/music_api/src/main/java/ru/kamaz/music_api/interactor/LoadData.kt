@@ -9,5 +9,4 @@ import ru.sir.core.None
 
 class LoadData(private val repository: Repository): FlowUseCase<List<Track>, None, None>()  {
     override suspend fun run(params: None): Either<None, List<Track>> =repository.loadData()
-
 }

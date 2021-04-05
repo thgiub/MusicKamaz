@@ -36,8 +36,22 @@
     <style name="test" parent="">
         <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
         <item name="appWidgetTextColor">@color/light_blue_50</item>
-
     </style>
 
+    <style name="controlButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/ic_btn_background</item>
+    </style>
 
+    <style name="controlButtonBig" parent="controlButton">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">120dp</item>
+        <item name="android:padding">35dp</item>
+    </style>
+
+    <style name="controlButtonBigBlue" parent="controlButtonBig">
+        <item name="android:background">@drawable/ic_btn_background_blue</item>
+    </style>
 </resources>

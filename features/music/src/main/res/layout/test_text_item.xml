@@ -10,21 +10,29 @@
     android:layout_height="wrap_content"
     android:padding="20dp">
 
-    <ImageView
+
+    <androidx.cardview.widget.CardView
         android:id="@+id/micro_picture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="0dp"
         android:src="@drawable/korj"
+        android:elevation="@dimen/margin"
+        app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/music_name"
-        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:src="@drawable/korj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </ImageView>
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/music_name"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="0dp"
         android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/artist_name"
         app:layout_constraintEnd_toStartOf="@+id/like"
@@ -36,7 +44,7 @@
     <TextView
         android:id="@+id/artist_name"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="0dp"
         android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="@+id/micro_picture"
         app:layout_constraintStart_toStartOf="@id/music_name"
@@ -44,25 +52,21 @@
         app:layout_constraintEnd_toEndOf="@id/music_name" />
 
     <ImageView
+        style="@style/controlButton"
         android:id="@+id/like"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:src="@drawable/ic_star"
+        android:src="@drawable/ic_like_false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/settings"
-        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@+id/music_name"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/settings"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="20dp"
+        style="@style/controlButton"
+        android:layout_marginStart="@dimen/margin"
         android:src="@drawable/ic_three_point"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@+id/like"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

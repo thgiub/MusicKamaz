@@ -1,6 +1,7 @@
 package ru.kamaz.music.di.modules
 
 import android.content.Context
+import android.media.MediaPlayer
 import dagger.Module
 import dagger.Provides
 import ru.kamaz.music.media.AppMediaManager
@@ -17,5 +18,9 @@ class DataModule {
     }
 
     @Provides
-    fun provideRepository(media:MediaManager):Repository= RepositoryImpl(media)
+    @Singleton
+    fun provideMediaPlayer(): MediaPlayer = MediaPlayer()
+
+    @Provides
+    fun provideRepository(media: MediaManager, mediaPlayer: MediaPlayer): Repository = RepositoryImpl(media, mediaPlayer)
 }
