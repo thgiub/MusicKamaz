@@ -1,13 +1,16 @@
 package ru.kamaz.music.view_models
 
 import android.app.Application
-import android.content.ContentUris
+import android.content.*
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.IBinder
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.GetMusicCover
 import ru.kamaz.music_api.interactor.GetMusicPosition
 import ru.kamaz.music_api.interactor.LoadData
@@ -25,9 +28,10 @@ class MusicFragmentViewModel @Inject constructor(
     private val mediaManager: MediaManager,
     private val getMusicCover: GetMusicCover,
     private val getMusicPosition: GetMusicPosition
-) : BaseViewModel(application),MediaPlayer.OnCompletionListener {
+) : BaseViewModel(application),MediaPlayer.OnCompletionListener/*, ServiceConnection*/ {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
+    private var service: MusicServiceInterface? = null
 
     private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
     val isPlaying = _isPlaying.asStateFlow()
@@ -61,16 +65,22 @@ class MusicFragmentViewModel @Inject constructor(
             .build()
         mediaPlayer.setOnCompletionListener(this)
         mediaPlayer.setAudioAttributes(audioAttributes)
+
+     /*   val intent = Intent(context, MusicService::class.java)
+        context.bindService(intent, this, Context.BIND_AUTO_CREATE)*/
         super.init()
     }
 
     override fun onCreate() {
-        updateTracks(mediaManager)
+        updateTracks(   mediaManager)
         super.onCreate()
     }
 
     fun startTrack(){
-        updateTracks(mediaManager)
+        service?.testPlay(tracks[currentTrackPosition])
+
+       // service?.startTrack(context)
+     /*   updateTracks(mediaManager)
         val currentTrack = tracks[currentTrackPosition]
 
         _title.value = currentTrack.title
@@ -84,7 +94,6 @@ class MusicFragmentViewModel @Inject constructor(
             android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             id
         )
-
         getMusicImg(albumID)
 
         mediaPlayer.apply {
@@ -94,7 +103,7 @@ class MusicFragmentViewModel @Inject constructor(
             prepare()
         }
 
-        updateSeekBar()
+        updateSeekBar()*/
     }
 
     fun playOrPause() {
@@ -172,4 +181,12 @@ class MusicFragmentViewModel @Inject constructor(
     override fun onCompletion(mp: MediaPlayer?) {
         nextTrack()
     }
+
+   /* override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        this.service = (service as MusicService.MyBinder).getService()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        service= null
+    }*/
 }

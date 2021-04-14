@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SeekBar
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R

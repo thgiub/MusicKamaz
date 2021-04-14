@@ -4,6 +4,7 @@ package ru.kamaz.music.view_models
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.databinding.TestTextItemBinding
+import ru.kamaz.music.ui.TrackFragment
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
@@ -11,9 +12,11 @@ import kotlin.math.atan
 
 class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     private val artist = MutableStateFlow("")
-    private  val title =MutableStateFlow("")
+    private val title =MutableStateFlow("")
+    private lateinit var data: Track
 
-    override fun bindData(data:Track) {
+    override fun bindData(data: Track) {
+        this.data = data
         artist.value= data.artist
         title.value= data.title
     }
@@ -26,5 +29,8 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
            binding.musicName.text=it
        }
 
+        binding.root.setOnClickListener {
+            (parent as TrackFragment).onTrackClicked(data)
+        }
     }
 }

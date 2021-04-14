@@ -17,7 +17,6 @@ class TrackFragment :
 
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
-
     }
 
     override fun initBinding(
@@ -32,11 +31,13 @@ class TrackFragment :
 
     }
 
-
+    fun onTrackClicked(track: Track) {
+        viewModel.onItemClick(track)
+    }
 
     private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
         .addProducer(MusicListViewHolderProducer())
         .build()
-        //.getObserver { items = it }
+
 }
 

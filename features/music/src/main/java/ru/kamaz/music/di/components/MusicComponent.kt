@@ -5,6 +5,7 @@ import ru.kamaz.music.di.modules.CacheModule
 import ru.kamaz.music.di.modules.DataModule
 import ru.kamaz.music.di.modules.DomainModule
 import ru.kamaz.music.di.modules.ViewModelModel
+import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.ui.TrackFragment
 import ru.kamaz.music.ui.MusicFragment
 import ru.sir.presentation.base.BaseDaggerComponent
@@ -20,4 +21,5 @@ interface MusicComponent : BaseDaggerComponent {
 
     fun inject(fragment: MusicFragment)
     fun inject(fragment: TrackFragment)
+    fun inject(service: MusicService)
 }

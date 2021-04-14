@@ -7,7 +7,6 @@ import ru.kamaz.musickamaz.di.components.AppComponent
 import ru.kamaz.musickamaz.di.components.DaggerAppComponent
 
 
-import ru.kamaz.musickamaz.di.components.modules.AppModule
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseDaggerComponent
 import java.lang.IllegalArgumentException

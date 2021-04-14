@@ -32,7 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="8">
+        >
 
         <ImageView
             style="@style/controlButtonBig"
@@ -58,7 +58,7 @@
     <TextView
         android:id="@+id/song"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:text="Vesenny les"
@@ -68,12 +68,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/next_prev"
-        app:layout_constraintVertical_weight="1"/>
+       />
 
     <TextView
         android:id="@+id/artist"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:text="MC Pox"
@@ -83,12 +83,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/song"
-        app:layout_constraintVertical_weight="0.6"/>
+     />
 
     <SeekBar
         android:id="@+id/seek"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:saveEnabled="false"
@@ -98,12 +98,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/artist"
-        app:layout_constraintVertical_weight="0.6"/>
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/times"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:orientation="horizontal"
@@ -111,7 +111,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seek"
-        app:layout_constraintVertical_weight="0.6"
+
         >
 
         <TextView
@@ -146,7 +146,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/music_buttons"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="@dimen/marginTop"
         android:layout_marginBottom="@dimen/marginTop"
@@ -154,7 +154,7 @@
         app:layout_constraintEnd_toEndOf="@+id/times"
         app:layout_constraintStart_toStartOf="@+id/times"
         app:layout_constraintTop_toBottomOf="@+id/times"
-        app:layout_constraintVertical_weight="2">
+      >
 
         <ImageView
             android:id="@+id/folder"
@@ -221,5 +221,8 @@
             app:srcCompat="@drawable/open_track_list" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
