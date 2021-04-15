@@ -88,7 +88,7 @@ class MusicFragment :
             binding.seek.max = it
         }
 
-        viewModel.seek.launchWhenStarted(lifecycleScope) {
+        viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
             val currentPosition = if (it < 0) 0 else it
             binding.seek.progress = currentPosition
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())

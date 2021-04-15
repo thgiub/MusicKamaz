@@ -2,7 +2,10 @@ package ru.kamaz.music.view_models
 
 
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import ru.kamaz.music.databinding.TestTextItemBinding
 import ru.kamaz.music.ui.TrackFragment
 import ru.kamaz.music_api.models.Track

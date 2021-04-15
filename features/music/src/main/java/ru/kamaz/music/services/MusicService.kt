@@ -12,19 +12,20 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.*
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.PermissionUtils
 import ru.kamaz.music_api.interactor.GetMusicCover
+import ru.kamaz.music_api.interactor.GetMusicPosition
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.easyLog
 import javax.inject.Inject
 
-class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletionListener {
+class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener {
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -35,19 +36,33 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
     @Inject
     lateinit var getMusicCover: GetMusicCover
 
-    inner class MyBinder : Binder() {
-        fun getService(): MusicServiceInterface = this@MusicService
-    }
+    @Inject
+    lateinit var getMusicPosition: GetMusicPosition
+    lateinit var myviewModel:MusicServiceInterface.ViewModel
 
+    inner class MyBinder : Binder() {
+        fun getService(): MusicServiceInterface.Service = this@MusicService
+    }
 
     private var currentTrackPosition = 0
     private var tracks = ArrayList<Track>()
     private val binder = MyBinder()
+
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
+
     private val _maxSeek = MutableStateFlow(0)
     val maxSeek = _maxSeek.asStateFlow()
+
     override fun onBind(intent: Intent?): IBinder = binder
+
+    override fun setViewModel(viewModel: MusicServiceInterface.ViewModel) {
+       this.myviewModel=viewModel
+    }
+
+    override fun init() {
+        TODO("Not yet implemented")
+    }
 
     override fun startTrack(context: Context) {
 
@@ -73,6 +88,8 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
         val currentTrack = track
         val albumID: Long = currentTrack.albumId
 
+        updateMusicName(currentTrack.title,currentTrack.artist,currentTrack.duration)
+
         getMusicImg(albumID)
         mediaPlayer.apply {
             stop()
@@ -81,17 +98,22 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
             prepare()
             start()
         }
+
+        updateSeekBar()
     }
 
-
-
-    override fun playOrPause() {
+    override fun playOrPause(): Boolean {
         when (isPlaying()) {
             true -> pause()
             false -> resume()
         }
+        return isPlaying()
     }
+    private fun updateMusicName(title: String,artist:String,duration: String){
 
+        myviewModel.updateMusicName(title,artist,duration)
+
+    }
     override fun getMusicImg(albumID: Long) {
         if (getMusicCover.isActive())
             getMusicCover.unsubscribe()
@@ -126,8 +148,9 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
         mediaPlayer.seekTo(position)
     }
 
-    override fun updateSeekBar() {
-        _maxSeek.value = mediaPlayer.duration
+    private fun updateSeekBar() {
+      val duration = mediaPlayer.duration
+        myviewModel.onUpdateSeekBar(duration)
     }
 
     override fun previousTrack(context: Context) {
@@ -135,14 +158,13 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
             tracks.size -> currentTrackPosition = 0
             else -> currentTrackPosition++
         }
-        startTrack(context)
+        testPlay(tracks[currentTrackPosition])
         when (isPlaying()) {
             true -> mediaPlayer.start()
         }
     }
 
-    fun init() {
-
+    fun initMediaPlayer() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -156,7 +178,7 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
             -1 -> currentTrackPosition = tracks.size - 1
             else -> currentTrackPosition--
         }
-        startTrack(context)
+        testPlay(tracks[currentTrackPosition])
         when (isPlaying()) {
             true -> mediaPlayer.start()
         }
@@ -170,7 +192,7 @@ class MusicService() : Service(), MusicServiceInterface, MediaPlayer.OnCompletio
         super.onCreate()
         (application as BaseApplication).getComponent<MusicComponent>().inject(this)
         updateTracks(mediaManager)
-        init()
+        initMediaPlayer()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

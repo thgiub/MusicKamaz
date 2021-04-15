@@ -30,7 +30,7 @@ class TrackViewModel @Inject constructor(
         private const val RV_ITEM = 2
     }
 
-    private var service: MusicServiceInterface? = null
+    private var service: MusicServiceInterface.Service? = null
 
 
     private val _isLoading = MutableStateFlow(false)

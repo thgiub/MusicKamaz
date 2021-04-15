@@ -28,10 +28,10 @@ class MusicFragmentViewModel @Inject constructor(
     private val mediaManager: MediaManager,
     private val getMusicCover: GetMusicCover,
     private val getMusicPosition: GetMusicPosition
-) : BaseViewModel(application),MediaPlayer.OnCompletionListener/*, ServiceConnection*/ {
+) : BaseViewModel(application),MediaPlayer.OnCompletionListener, ServiceConnection,MusicServiceInterface.ViewModel {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
-    private var service: MusicServiceInterface? = null
+    private var service: MusicServiceInterface.Service? = null
 
     private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
     val isPlaying = _isPlaying.asStateFlow()
@@ -48,8 +48,7 @@ class MusicFragmentViewModel @Inject constructor(
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
 
-    //private val _seek = MutableStateFlow(0)
-    val seek: StateFlow<Int> = getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
+    var musicPosition: StateFlow<Int> = getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
     private val _maxSeek = MutableStateFlow(0)
     val maxSeek = _maxSeek.asStateFlow()
@@ -58,6 +57,8 @@ class MusicFragmentViewModel @Inject constructor(
         mediaPlayer.release()
         super.onDestroy()
     }
+
+
     override fun init() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -66,9 +67,8 @@ class MusicFragmentViewModel @Inject constructor(
         mediaPlayer.setOnCompletionListener(this)
         mediaPlayer.setAudioAttributes(audioAttributes)
 
-     /*   val intent = Intent(context, MusicService::class.java)
-        context.bindService(intent, this, Context.BIND_AUTO_CREATE)*/
-        super.init()
+        val intent = Intent(context, MusicService::class.java)
+        context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
 
     override fun onCreate() {
@@ -78,97 +78,23 @@ class MusicFragmentViewModel @Inject constructor(
 
     fun startTrack(){
         service?.testPlay(tracks[currentTrackPosition])
-
-       // service?.startTrack(context)
-     /*   updateTracks(mediaManager)
-        val currentTrack = tracks[currentTrackPosition]
-
-        _title.value = currentTrack.title
-        _artist.value= currentTrack.artist
-       _duration.value= currentTrack.duration
-
-
-        val id: Long = currentTrack.id
-        val albumID: Long = currentTrack.albumId
-        val myUri: Uri = ContentUris.withAppendedId(
-            android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            id
-        )
-        getMusicImg(albumID)
-
-        mediaPlayer.apply {
-            stop()
-            reset()
-            setDataSource(context, myUri)
-            prepare()
-        }
-
-        updateSeekBar()*/
     }
 
     fun playOrPause() {
-        when(isPlaying.value) {
-            true -> pause()
-            false -> resume()
-        }
+        _isPlaying.value = service?.playOrPause() ?: false
     }
 
-    private fun getMusicImg(albumID: Long) {
-        if (getMusicCover.isActive())
-            getMusicCover.unsubscribe()
-
-        getMusicCover(GetMusicCover.Params(albumID)) {
-            "Cover loaded: $it".easyLog(this)
-            _cover.value = when (it) {
-                is Either.Left ->  ""
-                is Either.Right -> {
-                    "New cover = ${it.r}".easyLog(this)
-                    it.r
-                }
-                else -> ""
-            }
-        }
-    }
-
-    fun pause() {
-        _isPlaying.value = false
-        mediaPlayer.pause()
-    }
-
-    fun resume() {
-        _isPlaying.value = true
-       mediaPlayer.start()
-    }
 
     fun checkPosition(position: Int){
-        mediaPlayer.seekTo(position)
-    }
-
-    private fun updateSeekBar() {
-        _maxSeek.value = mediaPlayer.duration
+         service?.checkPosition(position)
     }
 
     fun previousTrack() {
-
-        when(currentTrackPosition + 1) {
-            tracks.size -> currentTrackPosition = 0
-            else -> currentTrackPosition++
-        }
-        startTrack()
-        when (isPlaying.value ){
-            true-> mediaPlayer.start()
-        }
+        service?.previousTrack(context)
     }
 
     fun nextTrack() {
-        when(currentTrackPosition-1){
-            -1 -> currentTrackPosition = tracks.size - 1
-            else -> currentTrackPosition--
-        }
-        startTrack()
-        when (isPlaying.value ){
-            true-> mediaPlayer.start()
-        }
+      service?.nextTrack(context)
     }
 
     fun updateTracks(mediaManager: MediaManager) {
@@ -182,11 +108,39 @@ class MusicFragmentViewModel @Inject constructor(
         nextTrack()
     }
 
-   /* override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+   override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         this.service = (service as MusicService.MyBinder).getService()
+        this.service?.setViewModel(this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        service= null
-    }*/
+        service = null
+    }
+
+    override fun updateMusicName(title: String,artist:String,duration: String) {
+        this._title.value=title
+        _artist.value= artist
+        _duration.value= duration
+    }
+
+
+    override fun addListener() {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeListener() {
+        TODO("Not yet implemented")
+    }
+
+    /* override fun onUpdateSeek(progress:StateFlow<Int>) {
+         this.musicPosition= progress
+     }*/
+
+    override fun onCheckPosition(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onUpdateSeekBar(duration: Int) {
+        _maxSeek.value = duration
+    }
 }
