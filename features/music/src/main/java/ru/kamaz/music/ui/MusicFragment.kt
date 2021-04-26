@@ -100,7 +100,7 @@ class MusicFragment :
 
         if (coverPath.isEmpty()) {
             Picasso.with(context)
-                .load(R.drawable.diaz)
+                .load(R.drawable.default_img_music)
                 .into(binding.picture)
         } else {
             Picasso.with(context)

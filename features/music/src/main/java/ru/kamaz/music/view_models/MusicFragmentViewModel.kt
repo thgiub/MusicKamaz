@@ -6,6 +6,7 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.IBinder
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.kamaz.music.data.MediaManager
@@ -23,10 +24,8 @@ import kotlin.collections.ArrayList
 
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
-    private val loadData: LoadData,
     private val mediaPlayer: MediaPlayer,
     private val mediaManager: MediaManager,
-    private val getMusicCover: GetMusicCover,
     private val getMusicPosition: GetMusicPosition
 ) : BaseViewModel(application),MediaPlayer.OnCompletionListener, ServiceConnection,MusicServiceInterface.ViewModel {
     private var tracks = ArrayList<Track>()
@@ -109,7 +108,8 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        this.service = (service as MusicService.MyBinder).getService()
+       Log.d("serWStart", "onServiceConnected: TRACK-VM")
+       this.service = (service as MusicService.MyBinder).getService()
         this.service?.setViewModel(this)
     }
 
@@ -142,5 +142,15 @@ class MusicFragmentViewModel @Inject constructor(
 
     override fun onUpdateSeekBar(duration: Int) {
         _maxSeek.value = duration
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("serWStart", "onResume: VM")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("serWStart", "onStop: VM")
     }
 }

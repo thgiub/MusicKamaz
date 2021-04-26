@@ -1,3 +1,5 @@
+include ':features:mediator'
+include ':features:widget'
 include ':features:music_api'
 include ':features:music'
 include ':app'

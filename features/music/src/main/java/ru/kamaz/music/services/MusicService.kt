@@ -1,22 +1,26 @@
 package ru.kamaz.music.services
 
+import android.R
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
-import android.content.ContentUris
+import android.content.*
 import android.content.ContentValues.TAG
-import android.content.Context
-import android.content.Intent
+import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.viewModelScope
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.PRIORITY_MIN
 import kotlinx.coroutines.flow.*
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
-import ru.kamaz.music.ui.PermissionUtils
 import ru.kamaz.music_api.interactor.GetMusicCover
 import ru.kamaz.music_api.interactor.GetMusicPosition
 import ru.kamaz.music_api.models.Track
@@ -25,7 +29,19 @@ import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.easyLog
 import javax.inject.Inject
 
+
 class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener {
+
+    companion object {
+
+        const val ACTION_TOGGLE_PAUSE = "play"
+        const val ACTION_NEXT= "next"
+        const val ACTION_PREV = "prev"
+        const val APP_WIDGET_UPDATE = ".appwidgetupdate"
+        const val EXTRA_APP_WIDGET_NAME = "ru.kamaz.musickamaz"
+        const val META_CHANGED = ".metachanged"
+        const val PLAY_STATE_CHANGED = ".playstatechanged"
+    }
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -40,9 +56,11 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     lateinit var getMusicPosition: GetMusicPosition
     lateinit var myviewModel:MusicServiceInterface.ViewModel
 
+
     inner class MyBinder : Binder() {
         fun getService(): MusicServiceInterface.Service = this@MusicService
     }
+
 
     private var currentTrackPosition = 0
     private var tracks = ArrayList<Track>()
@@ -88,7 +106,7 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         val currentTrack = track
         val albumID: Long = currentTrack.albumId
 
-        updateMusicName(currentTrack.title,currentTrack.artist,currentTrack.duration)
+        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
 
         getMusicImg(albumID)
         mediaPlayer.apply {
@@ -109,9 +127,9 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
         return isPlaying()
     }
-    private fun updateMusicName(title: String,artist:String,duration: String){
+    private fun updateMusicName(title: String, artist: String, duration: String){
 
-        myviewModel.updateMusicName(title,artist,duration)
+        myviewModel.updateMusicName(title, artist, duration)
 
     }
     override fun getMusicImg(albumID: Long) {
@@ -164,6 +182,18 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
+   fun previousTrack() {
+        when (currentTrackPosition + 1) {
+            tracks.size -> currentTrackPosition = 0
+            else -> currentTrackPosition++
+        }
+        testPlay(tracks[currentTrackPosition])
+        when (isPlaying()) {
+            true -> mediaPlayer.start()
+        }
+    }
+
+
     fun initMediaPlayer() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -184,19 +214,80 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
+   fun nextTrack() {
+        when (currentTrackPosition - 1) {
+            -1 -> currentTrackPosition = tracks.size - 1
+            else -> currentTrackPosition--
+        }
+        testPlay(tracks[currentTrackPosition])
+        when (isPlaying()) {
+            true -> mediaPlayer.start()
+        }
+    }
+
  /*   override fun updateMusic(track: Track) {
         this.tracks = track
     }*/
+
 
     override fun onCreate() {
         super.onCreate()
         (application as BaseApplication).getComponent<MusicComponent>().inject(this)
         updateTracks(mediaManager)
         initMediaPlayer()
+        startForeground()
+      /*  val builder: Notification.Builder = Notification.Builder(this)
+            .setSmallIcon(R.mipmap.sym_def_app_icon)
+        val notification: Notification
+        notification =
+            if (Build.VERSION.SDK_INT < 16) builder.getNotification() else builder.build()
+        startForeground(777, notification)*/
+
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
+
+        Log.i("PLaystart", "onStartCommand: playstart")
+        if (intent != null) {
+            when (intent.action) {
+                ACTION_TOGGLE_PAUSE -> playOrPause()
+                ACTION_NEXT-> nextTrack()
+                ACTION_PREV-> previousTrack()
+            }
+        }
+
+        return START_STICKY //super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun startForeground() {
+        val channelId =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel("my_service", "My Background Service")
+            } else {
+                // If earlier version channel ID is not used
+                // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+                ""
+            }
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId )
+        val notification = notificationBuilder.setOngoing(true)
+            .setSmallIcon(R.mipmap.sym_def_app_icon)
+            .setPriority(PRIORITY_MIN)
+            .setCategory(Notification.CATEGORY_SERVICE)
+            .build()
+        startForeground(101, notification)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(channelId: String, channelName: String): String{
+        val chan = NotificationChannel(channelId,
+            channelName, NotificationManager.IMPORTANCE_NONE)
+        chan.lightColor = Color.BLUE
+        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        service.createNotificationChannel(chan)
+        return channelId
     }
 
     override fun updateTracks(mediaManager: MediaManager) {

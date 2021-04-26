@@ -17,8 +17,10 @@
             <option value="$PROJECT_DIR$/entities/data" />
             <option value="$PROJECT_DIR$/entities/presentation" />
             <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/mediator" />
             <option value="$PROJECT_DIR$/features/music" />
             <option value="$PROJECT_DIR$/features/music_api" />
+            <option value="$PROJECT_DIR$/features/widget" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

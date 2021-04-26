@@ -5,7 +5,9 @@
       <module name="MusicKamaz.app" target="1.8" />
       <module name="MusicKamaz.entities.data" target="1.8" />
       <module name="MusicKamaz.entities.presentation" target="1.8" />
+      <module name="MusicKamaz.features.mediator" target="1.8" />
       <module name="MusicKamaz.features.music" target="1.8" />
+      <module name="MusicKamaz.features.widget" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

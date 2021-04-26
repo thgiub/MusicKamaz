@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,6 +67,7 @@ class TrackViewModel @Inject constructor(
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Log.d("serWStart", "onServiceConnected: LIST-VM")
         this.service = (service as MusicService.MyBinder).getService()
     }
 
