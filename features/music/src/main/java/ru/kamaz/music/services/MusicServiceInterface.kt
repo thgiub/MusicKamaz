@@ -20,10 +20,10 @@ interface MusicServiceInterface{
         fun isPlaying(): Boolean
         fun checkPosition(position: Int)
         fun previousTrack(context: Context)
-        fun nextTrack(context: Context)
-        /* fun updateMusic(track: Track)*/
+        fun nextTrack(context: Context)/* fun updateMusic(track: Track)*/
         fun updateTracks(mediaManager: MediaManager)
         fun intMediaPlayer()
+        fun sourceSelection(action: MusicService.SourceEnum)
     }
 
     interface ViewModel{
@@ -32,6 +32,7 @@ interface MusicServiceInterface{
         fun removeListener()
         fun onCheckPosition(position: Int)
         fun onUpdateSeekBar(duration:Int)
+        fun selectBtMode()
     }
 
 }

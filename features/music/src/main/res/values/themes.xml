@@ -44,6 +44,19 @@
         <item name="android:padding">@dimen/control_btn_padding</item>
         <item name="android:background">@drawable/ic_btn_background</item>
     </style>
+    <style name="Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_item</item>
+    </style>
+
+    <style name="ButtonOn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_item_on</item>
+    </style>
 
     <style name="controlButtonBig" parent="controlButton">
         <item name="android:layout_width">120dp</item>

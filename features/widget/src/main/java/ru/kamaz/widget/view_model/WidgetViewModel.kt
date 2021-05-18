@@ -33,7 +33,12 @@ class WidgetViewModel: MusicServiceInterface.ViewModel, ServiceConnection
 
     }
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+         override fun selectBtMode() {
+             TODO("Not yet implemented")
+         }
+
+
+         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         this.service = (service as MusicService.MyBinder).getService()
         this.service?.setViewModel(this)
     }

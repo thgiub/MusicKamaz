@@ -1,4 +1,4 @@
-package ru.kamaz.music.view_models
+         package ru.kamaz.music.view_models
 
 import android.app.Application
 import android.content.*
@@ -46,6 +46,10 @@ class MusicFragmentViewModel @Inject constructor(
 
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
+
+    private val _mode = MutableStateFlow("")
+    val mode = _mode.asStateFlow()
+
 
     var musicPosition: StateFlow<Int> = getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
@@ -103,6 +107,10 @@ class MusicFragmentViewModel @Inject constructor(
         }
     }
 
+    fun vmSourceSelection(action:MusicService.SourceEnum){
+       service?.sourceSelection(action)
+    }
+
     override fun onCompletion(mp: MediaPlayer?) {
         nextTrack()
     }
@@ -143,6 +151,15 @@ class MusicFragmentViewModel @Inject constructor(
     override fun onUpdateSeekBar(duration: Int) {
         _maxSeek.value = duration
     }
+
+    override fun selectBtMode() {
+
+    }
+
+   /* override fun selectMode(action: MusicService.sourceEnum) {
+        _mode.value = action.toString()
+    }*/
+
 
     override fun onResume() {
         super.onResume()

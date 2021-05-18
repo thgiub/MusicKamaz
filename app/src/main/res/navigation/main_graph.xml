@@ -11,4 +11,8 @@
         android:id="@+id/trackFragment"
         android:name="ru.kamaz.music.ui.TrackFragment"
         android:label="TrackFragment" />
+    <fragment
+        android:id="@+id/btFragment"
+        android:name="ru.kamaz.music.ui.bt.BtFragment"
+        android:label="BtFragment" />
 </navigation>

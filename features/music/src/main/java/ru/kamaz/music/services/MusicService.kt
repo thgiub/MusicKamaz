@@ -19,6 +19,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
 import kotlinx.coroutines.flow.*
+import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
+import ru.biozzlab.twmanager.managers.BluetoothManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music_api.interactor.GetMusicCover
@@ -30,7 +32,9 @@ import ru.sir.presentation.extensions.easyLog
 import javax.inject.Inject
 
 
-class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener {
+class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener, BluetoothManagerListener  {
+
+    val twManager = BluetoothManager()
 
     companion object {
 
@@ -54,7 +58,9 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
 
     @Inject
     lateinit var getMusicPosition: GetMusicPosition
-    lateinit var myviewModel:MusicServiceInterface.ViewModel
+
+
+    lateinit var myViewModel:MusicServiceInterface.ViewModel
 
 
     inner class MyBinder : Binder() {
@@ -62,12 +68,24 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     }
 
 
+
     private var currentTrackPosition = 0
     private var tracks = ArrayList<Track>()
     private val binder = MyBinder()
 
+    private var mode = SourceEnum.DISK
+
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
+
+    private val _name = MutableStateFlow("")
+    var name = "null"
+
+    var duration = "00:00"
+    var artist = "null"
+
+    private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
+    val tickFlow: MutableSharedFlow<Unit> = _tickFlow
 
     private val _maxSeek = MutableStateFlow(0)
     val maxSeek = _maxSeek.asStateFlow()
@@ -75,11 +93,45 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun setViewModel(viewModel: MusicServiceInterface.ViewModel) {
-       this.myviewModel=viewModel
+       this.myViewModel=viewModel
     }
 
     override fun init() {
         TODO("Not yet implemented")
+    }
+
+   enum class SourceEnum(val value: Int ){
+       BT(0),
+       AUX(1),
+       DISK(2)
+   }
+
+    override fun onBluetoothMusicDataChanged(name: String, artist: String) {
+        this.name = name
+        this.artist= artist
+    }
+
+    enum class musicButtons(val value: Int){
+        PLAY_BT(11),
+        PLAY_DISK(21),
+        NEXT_BT(12),
+        PREV_BT(13),
+        NEXT_DISK(22),
+        PREV_DISK(23),
+    }
+
+    fun startBtMode(){
+        myViewModel.selectBtMode()
+        this.mode = SourceEnum.BT
+
+        twManager.startMonitoring(applicationContext) {
+            twManager.addListener(this)
+            twManager.requestConnectionInfo()
+        }
+    }
+
+    fun startDiskMode(){
+       this.mode = SourceEnum.DISK
     }
 
     override fun startTrack(context: Context) {
@@ -121,15 +173,26 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     }
 
     override fun playOrPause(): Boolean {
-        when (isPlaying()) {
-            true -> pause()
-            false -> resume()
-        }
-        return isPlaying()
+
+      when(mode){
+          SourceEnum.DISK -> {
+              when (isPlaying()) {
+                  true -> pause()
+                  false -> resume()
+              }
+          }
+          SourceEnum.BT -> {
+              twManager.playerPlayPause()
+
+              Log.i("PoP", "play or pause")
+          }
+          SourceEnum.AUX -> TODO()
+      }
+      return isPlaying()
     }
     private fun updateMusicName(title: String, artist: String, duration: String){
 
-        myviewModel.updateMusicName(title, artist, duration)
+        myViewModel.updateMusicName(title, artist, duration)
 
     }
     override fun getMusicImg(albumID: Long) {
@@ -168,21 +231,35 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
 
     private fun updateSeekBar() {
       val duration = mediaPlayer.duration
-        myviewModel.onUpdateSeekBar(duration)
+        myViewModel.onUpdateSeekBar(duration)
     }
 
     override fun previousTrack(context: Context) {
-        when (currentTrackPosition + 1) {
-            tracks.size -> currentTrackPosition = 0
-            else -> currentTrackPosition++
+        when(mode){
+            SourceEnum.DISK->{
+                when (currentTrackPosition + 1) {
+                    tracks.size -> currentTrackPosition = 0
+                    else -> currentTrackPosition++
+                }
+                testPlay(tracks[currentTrackPosition])
+                when (isPlaying()) {
+                    true -> mediaPlayer.start()
+                }
+            }
+            SourceEnum.BT->{
+
+                myViewModel.updateMusicName(name, artist, duration)
+               // updateMusicName(name,artist,"2222")
+                twManager.playerPrev()
+            }
+            SourceEnum.AUX -> TODO()
         }
-        testPlay(tracks[currentTrackPosition])
-        when (isPlaying()) {
-            true -> mediaPlayer.start()
-        }
+
     }
 
    fun previousTrack() {
+
+
         when (currentTrackPosition + 1) {
             tracks.size -> currentTrackPosition = 0
             else -> currentTrackPosition++
@@ -204,14 +281,26 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     }
 
     override fun nextTrack(context: Context) {
-        when (currentTrackPosition - 1) {
-            -1 -> currentTrackPosition = tracks.size - 1
-            else -> currentTrackPosition--
+        when(mode){
+            SourceEnum.DISK->{
+                when (currentTrackPosition - 1) {
+                    -1 -> currentTrackPosition = tracks.size - 1
+                    else -> currentTrackPosition--
+                }
+                testPlay(tracks[currentTrackPosition])
+                when (isPlaying()) {
+                    true -> mediaPlayer.start()
+                }
+            }
+            SourceEnum.BT->{
+                twManager.playerNext()
+                updateMusicName(name,artist,duration)
+            }
+            SourceEnum.AUX->{
+
+            }
         }
-        testPlay(tracks[currentTrackPosition])
-        when (isPlaying()) {
-            true -> mediaPlayer.start()
-        }
+
     }
 
    fun nextTrack() {
@@ -236,14 +325,13 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         updateTracks(mediaManager)
         initMediaPlayer()
         startForeground()
+
       /*  val builder: Notification.Builder = Notification.Builder(this)
             .setSmallIcon(R.mipmap.sym_def_app_icon)
         val notification: Notification
         notification =
             if (Build.VERSION.SDK_INT < 16) builder.getNotification() else builder.build()
         startForeground(777, notification)*/
-
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -308,9 +396,19 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
+    override fun sourceSelection(action: SourceEnum) {
+        when(action){
+            SourceEnum.BT-> startBtMode()
+            SourceEnum.DISK-> startDiskMode()
+        }
+    }
+
     override fun onCompletion(mp: MediaPlayer?) {
 
     }
 
+    override fun onPlayerPlayPauseState(isPlaying: Boolean) {
+        "BT Player state = $isPlaying".easyLog(this)
+    }
 
 }

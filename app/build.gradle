@@ -55,6 +55,9 @@ dependencies {
 
     implementation project(path: ':features:music')
 
+    api twManager
+    api twManagerCore
+
     implementation dagger
     kapt daggerCompiler
 }

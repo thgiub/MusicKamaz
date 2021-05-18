@@ -17,6 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/music_buttons"
         android:foreground="@drawable/test2"
         />
@@ -161,15 +162,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/controlPanel"
+            app:layout_constraintEnd_toStartOf="@id/source_selection"
             app:srcCompat="@drawable/ic_folder_music" />
 
-        <include
-            android:id="@+id/controlPanel"
-            layout="@layout/buttons_fragment"
+        <ImageView
+            android:id="@+id/play_pause"
+            style="@style/controlButtonBigBlue"
             android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:visibility="visible"
+            android:layout_width="wrap_content"
+            app:srcCompat="@drawable/ic_play"
             app:layout_constraintStart_toEndOf="@id/folder"
             app:layout_constraintEnd_toStartOf="@id/open_list_fragment"
             app:layout_constraintTop_toTopOf="parent"
@@ -190,8 +191,9 @@
             style="@style/controlButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/controlPanel"
+            app:layout_constraintStart_toEndOf="@id/source_selection"
             app:layout_constraintTop_toTopOf="parent"
+            android:visibility="invisible"
             app:srcCompat="@drawable/open_track_list" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
