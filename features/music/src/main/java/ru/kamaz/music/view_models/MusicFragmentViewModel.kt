@@ -19,6 +19,7 @@ import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.extensions.easyLog
+import ru.sir.presentation.extensions.launchOn
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -30,16 +31,13 @@ class MusicFragmentViewModel @Inject constructor(
 ) : BaseViewModel(application),MediaPlayer.OnCompletionListener, ServiceConnection,MusicServiceInterface.ViewModel {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
-    private var service: MusicServiceInterface.Service? = null
 
     private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
     val isPlaying = _isPlaying.asStateFlow()
 
-    private val _artist = MutableStateFlow("Unknown")
-    val artist= _artist.asStateFlow()
+    val artist: StateFlow<String> by lazy { service.value?.getArtistName() ?: MutableStateFlow("Unknown") }
 
-    private val _title = MutableStateFlow("Unknown")
-    val title = _title.asStateFlow()
+    val title: StateFlow<String> by lazy { service.value?.getMusicName() ?: MutableStateFlow("Unknown") }
 
     private val _duration = MutableStateFlow("--:--")
     val duration= _duration.asStateFlow()
@@ -50,6 +48,8 @@ class MusicFragmentViewModel @Inject constructor(
     private val _mode = MutableStateFlow("")
     val mode = _mode.asStateFlow()
 
+    private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
+    val service = _service.asStateFlow()
 
     var musicPosition: StateFlow<Int> = getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
@@ -80,24 +80,24 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun startTrack(){
-        service?.testPlay(tracks[currentTrackPosition])
+        service.value?.testPlay(tracks[currentTrackPosition])
     }
 
     fun playOrPause() {
-        _isPlaying.value = service?.playOrPause() ?: false
+        _isPlaying.value = service.value?.playOrPause() ?: false
     }
 
 
     fun checkPosition(position: Int){
-         service?.checkPosition(position)
+         service.value?.checkPosition(position)
     }
 
     fun previousTrack() {
-        service?.previousTrack(context)
+        service.value?.previousTrack(context)
     }
 
     fun nextTrack() {
-      service?.nextTrack(context)
+      service.value?.nextTrack(context)
     }
 
     fun updateTracks(mediaManager: MediaManager) {
@@ -108,7 +108,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun vmSourceSelection(action:MusicService.SourceEnum){
-       service?.sourceSelection(action)
+       service.value?.sourceSelection(action)
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
@@ -117,20 +117,13 @@ class MusicFragmentViewModel @Inject constructor(
 
    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
        Log.d("serWStart", "onServiceConnected: TRACK-VM")
-       this.service = (service as MusicService.MyBinder).getService()
-        this.service?.setViewModel(this)
+       _service.value = (service as MusicService.MyBinder).getService()
+        this.service.value?.setViewModel(this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        service = null
+        _service.value = null
     }
-
-    override fun updateMusicName(title: String,artist:String,duration: String) {
-        this._title.value=title
-        _artist.value= artist
-        _duration.value= duration
-    }
-
 
     override fun addListener() {
         TODO("Not yet implemented")

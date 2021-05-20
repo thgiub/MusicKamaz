@@ -98,6 +98,13 @@ class MusicFragment :
     }
 
     override fun initVars() {
+        viewModel.service.launchWhenStarted(lifecycleScope) {
+            if (it == null) return@launchWhenStarted
+            initServiceVars()
+        }
+    }
+
+    private fun initServiceVars() {
         viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying)   binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_music)
             else     binding.controlPanel.playPause.setImageResource(R.drawable.ic_play)
@@ -151,11 +158,11 @@ class MusicFragment :
         binding.controlPanel.addToFolder.visibility=View.INVISIBLE
         binding.controlPanel.playPause.visibility=View.VISIBLE
         binding.openListFragment.visibility=View.INVISIBLE
-        binding.seek.visibility=View.VISIBLE
+        binding.seek.visibility=View.INVISIBLE
         binding.nextPrev.visibility=View.VISIBLE
         binding.artist.visibility=View.VISIBLE
         binding.song.visibility=View.VISIBLE
-        binding.times.visibility=View.VISIBLE
+        binding.times.visibility=View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)

@@ -1,4 +1,4 @@
-package ru.kamaz.music.services
+  package ru.kamaz.music.services
 
 import android.R
 import android.app.Notification
@@ -18,6 +18,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
@@ -79,10 +80,16 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     val cover = _cover.asStateFlow()
 
     private val _name = MutableStateFlow("")
-    var name = "null"
+    //var name = "null"
+    var duration= "00:00"
+/*    private var _duration =  MutableStateFlow("")
+    var duration =  _duration.asStateFlow()*/
+    //var artist = "null"
 
-    var duration = "00:00"
-    var artist = "null"
+    private val _title =  MutableStateFlow("Unknown")
+    val title =  _title.asStateFlow()
+    private val _artist =  MutableStateFlow("Unknown")
+    val artist =  _artist.asStateFlow()
 
     private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
     val tickFlow: MutableSharedFlow<Unit> = _tickFlow
@@ -107,23 +114,15 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
    }
 
     override fun onBluetoothMusicDataChanged(name: String, artist: String) {
-        this.name = name
-        this.artist= artist
+        _title.value = name
+        _artist.value = artist
     }
 
-    enum class musicButtons(val value: Int){
-        PLAY_BT(11),
-        PLAY_DISK(21),
-        NEXT_BT(12),
-        PREV_BT(13),
-        NEXT_DISK(22),
-        PREV_DISK(23),
-    }
-
-    fun startBtMode(){
+    fun startBtMode() {
         myViewModel.selectBtMode()
+        "до stopBt".easyLog(startBtMode())
         this.mode = SourceEnum.BT
-
+        stopMediaPlayer()
         twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
             twManager.requestConnectionInfo()
@@ -132,6 +131,16 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
 
     fun startDiskMode(){
        this.mode = SourceEnum.DISK
+        "после stopBt".easyLog(startDiskMode())
+        stopBtListener()
+        "до stopBt".easyLog(startDiskMode())
+    }
+
+
+    fun stopBtListener(){
+        twManager.removeListener(this)
+        twManager.stopMonitoring(applicationContext)
+        "до stopBt".easyLog(stopBtListener())
     }
 
     override fun startTrack(context: Context) {
@@ -153,6 +162,10 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
+    fun stopMediaPlayer(){
+        mediaPlayer.stop()
+    }
+
     override fun testPlay(track: Track) {
         updateTracks(mediaManager)
         val currentTrack = track
@@ -168,7 +181,6 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
             prepare()
             start()
         }
-
         updateSeekBar()
     }
 
@@ -190,11 +202,12 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
       }
       return isPlaying()
     }
+
     private fun updateMusicName(title: String, artist: String, duration: String){
-
-        myViewModel.updateMusicName(title, artist, duration)
-
+        _title.value = title
+        _artist.value = artist
     }
+
     override fun getMusicImg(albumID: Long) {
         if (getMusicCover.isActive())
             getMusicCover.unsubscribe()
@@ -212,14 +225,11 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
-
     override fun pause() {
-        //_isPlaying.value = false
         mediaPlayer.pause()
     }
 
     override fun resume() {
-        //_isPlaying.value = true
         mediaPlayer.start()
     }
 
@@ -247,9 +257,6 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
                 }
             }
             SourceEnum.BT->{
-
-                myViewModel.updateMusicName(name, artist, duration)
-               // updateMusicName(name,artist,"2222")
                 twManager.playerPrev()
             }
             SourceEnum.AUX -> TODO()
@@ -257,9 +264,9 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
 
     }
 
+
+
    fun previousTrack() {
-
-
         when (currentTrackPosition + 1) {
             tracks.size -> currentTrackPosition = 0
             else -> currentTrackPosition++
@@ -294,7 +301,7 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
             }
             SourceEnum.BT->{
                 twManager.playerNext()
-                updateMusicName(name,artist,duration)
+                //updateMusicName(name,artist,duration)
             }
             SourceEnum.AUX->{
 
@@ -314,24 +321,12 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
- /*   override fun updateMusic(track: Track) {
-        this.tracks = track
-    }*/
-
-
     override fun onCreate() {
         super.onCreate()
         (application as BaseApplication).getComponent<MusicComponent>().inject(this)
         updateTracks(mediaManager)
         initMediaPlayer()
         startForeground()
-
-      /*  val builder: Notification.Builder = Notification.Builder(this)
-            .setSmallIcon(R.mipmap.sym_def_app_icon)
-        val notification: Notification
-        notification =
-            if (Build.VERSION.SDK_INT < 16) builder.getNotification() else builder.build()
-        startForeground(777, notification)*/
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -353,8 +348,7 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 createNotificationChannel("my_service", "My Background Service")
             } else {
-                // If earlier version channel ID is not used
-                // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+
                 ""
             }
 
@@ -400,8 +394,13 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         when(action){
             SourceEnum.BT-> startBtMode()
             SourceEnum.DISK-> startDiskMode()
+            SourceEnum.AUX -> TODO()
         }
     }
+
+    override fun getMusicName(): StateFlow<String> = title
+
+    override fun getArtistName(): StateFlow<String> = artist
 
     override fun onCompletion(mp: MediaPlayer?) {
 

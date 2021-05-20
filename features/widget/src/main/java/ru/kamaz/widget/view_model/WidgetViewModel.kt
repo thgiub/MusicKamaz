@@ -13,11 +13,15 @@ class WidgetViewModel: MusicServiceInterface.ViewModel, ServiceConnection
 
 
     private var service: MusicServiceInterface.Service? = null
-    override fun updateMusicName(title: String, artist: String, duration: String) {
+  /*  override fun updateMusicName(title: String, artist: String, duration: String) {
         TODO("Not yet implemented")
     }
 
-    override fun addListener() {
+         override fun del2() {
+             TODO("Not yet implemented")
+         }*/
+
+         override fun addListener() {
         TODO("Not yet implemented")
     }
 

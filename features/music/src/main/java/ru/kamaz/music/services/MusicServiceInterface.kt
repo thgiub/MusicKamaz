@@ -24,10 +24,11 @@ interface MusicServiceInterface{
         fun updateTracks(mediaManager: MediaManager)
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
+        fun getMusicName(): StateFlow<String>
+        fun getArtistName(): StateFlow<String>
     }
 
     interface ViewModel{
-        fun updateMusicName(title: String,artist:String,duration: String)
         fun addListener()
         fun removeListener()
         fun onCheckPosition(position: Int)
