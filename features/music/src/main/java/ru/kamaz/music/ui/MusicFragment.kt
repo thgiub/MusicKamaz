@@ -62,10 +62,10 @@ class MusicFragment :
         }
         binding.sourceSelection.btnBt.setOnClickListener {
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-            btModeActivation()
+              btModeActivation()
         }
         binding.sourceSelection.disk.setOnClickListener {
-            viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
+                viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
             diskModeActivation()
         }
         binding.sourceSelection.aux.setOnClickListener {
@@ -140,7 +140,7 @@ class MusicFragment :
 
         if (coverPath.isEmpty()) {
             Picasso.with(context)
-                .load(R.drawable.default_img_music)
+                .load(R.drawable.png)
                 .into(binding.picture)
         } else {
             Picasso.with(context)

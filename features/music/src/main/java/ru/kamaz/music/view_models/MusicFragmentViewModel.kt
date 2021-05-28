@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.kamaz.music.data.MediaManager
@@ -39,6 +40,8 @@ class MusicFragmentViewModel @Inject constructor(
 
     val title: StateFlow<String> by lazy { service.value?.getMusicName() ?: MutableStateFlow("Unknown") }
 
+    val isNotConnected: StateFlow<Boolean> by lazy { service.value?.checkDeviceConnection() ?: MutableStateFlow(true) }
+
     private val _duration = MutableStateFlow("--:--")
     val duration= _duration.asStateFlow()
 
@@ -48,8 +51,15 @@ class MusicFragmentViewModel @Inject constructor(
     private val _mode = MutableStateFlow("")
     val mode = _mode.asStateFlow()
 
+
+
+
+
+
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
+
+
 
     var musicPosition: StateFlow<Int> = getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
@@ -80,6 +90,9 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun startTrack(){
+        if(tracks.isEmpty()){
+            musicEmpty()
+        }else
         service.value?.testPlay(tracks[currentTrackPosition])
     }
 
@@ -93,11 +106,20 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun previousTrack() {
-        service.value?.previousTrack(context)
+
+     /*   if(tracks.isEmpty()){
+            musicEmpty()
+        }else*/
+        service.value?.previousTrack()
     }
 
     fun nextTrack() {
-      service.value?.nextTrack(context)
+
+
+    /*    if(tracks.isEmpty()){
+            musicEmpty()
+        }else*/
+      service.value?.nextTrack()
     }
 
     fun updateTracks(mediaManager: MediaManager) {
@@ -108,7 +130,26 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun vmSourceSelection(action:MusicService.SourceEnum){
-       service.value?.sourceSelection(action)
+        when(action){
+           MusicService.SourceEnum.BT->{
+           if (isNotConnected.value){
+               service.value?.sourceSelection(action)
+           } else{
+               Toast.makeText(context,"Подключите Устройство", Toast.LENGTH_SHORT)
+           }
+
+           }
+
+           MusicService.SourceEnum.DISK->{
+               service.value?.sourceSelection(action)
+           }
+
+        }
+
+    }
+
+    fun musicEmpty(){
+        Toast.makeText(context, "нет песен", Toast.LENGTH_LONG).show()
     }
 
     override fun onCompletion(mp: MediaPlayer?) {

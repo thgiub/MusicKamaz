@@ -19,13 +19,15 @@ interface MusicServiceInterface{
         fun resume()
         fun isPlaying(): Boolean
         fun checkPosition(position: Int)
-        fun previousTrack(context: Context)
-        fun nextTrack(context: Context)/* fun updateMusic(track: Track)*/
+        fun previousTrack()
+        fun nextTrack()/* fun updateMusic(track: Track)*/
         fun updateTracks(mediaManager: MediaManager)
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
         fun getMusicName(): StateFlow<String>
         fun getArtistName(): StateFlow<String>
+        fun checkDeviceConnection(): StateFlow<Boolean>
+        fun updateWidget():StateFlow<Boolean>
     }
 
     interface ViewModel{

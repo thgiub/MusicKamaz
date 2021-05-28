@@ -11,15 +11,14 @@
 
     <ImageView
         android:id="@+id/picture"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:foreground="@drawable/test2"
         android:src="@drawable/default_img_music"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/music_buttons"
-        android:foreground="@drawable/test2"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/next_prev"
@@ -92,8 +91,10 @@
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:saveEnabled="false"
+        android:paddingBottom="9dp"
+        android:paddingTop="9dp"
         android:progressDrawable="@drawable/seekbar_style"
-        android:thumb="@drawable/custom_thumb"
+        android:thumb="@drawable/ic_seekbar_thumb"
         app:layout_constraintBottom_toTopOf="@+id/times"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -149,6 +150,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/times"
         app:layout_constraintStart_toStartOf="@+id/times"

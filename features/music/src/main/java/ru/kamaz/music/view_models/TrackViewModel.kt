@@ -43,7 +43,7 @@ class TrackViewModel @Inject constructor(
 
     override fun init() {
         _isLoading.value = true
-        loadData(None()).launchOn(viewModelScope) { it.either({}, ::onDataLoaded) }
+        loadData(None()) { it.either({}, ::onDataLoaded) }
 
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)

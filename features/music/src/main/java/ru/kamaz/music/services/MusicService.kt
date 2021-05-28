@@ -1,10 +1,11 @@
-  package ru.kamaz.music.services
+package ru.kamaz.music.services
 
 import android.R
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.ContentValues.TAG
 import android.graphics.Color
@@ -33,20 +34,25 @@ import ru.sir.presentation.extensions.easyLog
 import javax.inject.Inject
 
 
-class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener, BluetoothManagerListener  {
+class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
+    BluetoothManagerListener {
 
     val twManager = BluetoothManager()
+
+    private val _isNotConnected = MutableStateFlow(true)
+    val isNotConnected = _isNotConnected.asStateFlow()
 
     companion object {
 
         const val ACTION_TOGGLE_PAUSE = "play"
-        const val ACTION_NEXT= "next"
+        const val ACTION_NEXT = "next"
         const val ACTION_PREV = "prev"
         const val APP_WIDGET_UPDATE = ".appwidgetupdate"
         const val EXTRA_APP_WIDGET_NAME = "ru.kamaz.musickamaz"
         const val META_CHANGED = ".metachanged"
         const val PLAY_STATE_CHANGED = ".playstatechanged"
     }
+
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -61,14 +67,20 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     lateinit var getMusicPosition: GetMusicPosition
 
 
-    lateinit var myViewModel:MusicServiceInterface.ViewModel
+    lateinit var myViewModel: MusicServiceInterface.ViewModel
 
+
+    override fun onDeviceConnected() {
+        _isNotConnected.value = false
+    }
+
+    override fun onDeviceDisconnected() {
+        _isNotConnected.value = true
+    }
 
     inner class MyBinder : Binder() {
         fun getService(): MusicServiceInterface.Service = this@MusicService
     }
-
-
 
     private var currentTrackPosition = 0
     private var tracks = ArrayList<Track>()
@@ -79,17 +91,11 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
 
-    private val _name = MutableStateFlow("")
-    //var name = "null"
-    var duration= "00:00"
-/*    private var _duration =  MutableStateFlow("")
-    var duration =  _duration.asStateFlow()*/
-    //var artist = "null"
+    private val _title = MutableStateFlow("Unknown")
+    val title = _title.asStateFlow()
 
-    private val _title =  MutableStateFlow("Unknown")
-    val title =  _title.asStateFlow()
-    private val _artist =  MutableStateFlow("Unknown")
-    val artist =  _artist.asStateFlow()
+    private val _artist = MutableStateFlow("Unknown")
+    val artist = _artist.asStateFlow()
 
     private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
     val tickFlow: MutableSharedFlow<Unit> = _tickFlow
@@ -100,18 +106,18 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun setViewModel(viewModel: MusicServiceInterface.ViewModel) {
-       this.myViewModel=viewModel
+        this.myViewModel = viewModel
     }
 
     override fun init() {
         TODO("Not yet implemented")
     }
 
-   enum class SourceEnum(val value: Int ){
-       BT(0),
-       AUX(1),
-       DISK(2)
-   }
+    enum class SourceEnum(val value: Int) {
+        BT(0),
+        AUX(1),
+        DISK(2)
+    }
 
     override fun onBluetoothMusicDataChanged(name: String, artist: String) {
         _title.value = name
@@ -120,7 +126,6 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
 
     fun startBtMode() {
         myViewModel.selectBtMode()
-        "до stopBt".easyLog(startBtMode())
         this.mode = SourceEnum.BT
         stopMediaPlayer()
         twManager.startMonitoring(applicationContext) {
@@ -129,18 +134,15 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
-    fun startDiskMode(){
-       this.mode = SourceEnum.DISK
-        "после stopBt".easyLog(startDiskMode())
+    fun startDiskMode() {
+        this.mode = SourceEnum.DISK
         stopBtListener()
-        "до stopBt".easyLog(startDiskMode())
     }
 
 
-    fun stopBtListener(){
+    fun stopBtListener() {
         twManager.removeListener(this)
         twManager.stopMonitoring(applicationContext)
-        "до stopBt".easyLog(stopBtListener())
     }
 
     override fun startTrack(context: Context) {
@@ -162,11 +164,12 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         }
     }
 
-    fun stopMediaPlayer(){
+    fun stopMediaPlayer() {
         mediaPlayer.stop()
     }
 
     override fun testPlay(track: Track) {
+
         updateTracks(mediaManager)
         val currentTrack = track
         val albumID: Long = currentTrack.albumId
@@ -186,31 +189,31 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
 
     override fun playOrPause(): Boolean {
 
-      when(mode){
-          SourceEnum.DISK -> {
-              when (isPlaying()) {
-                  true -> pause()
-                  false -> resume()
-              }
-          }
-          SourceEnum.BT -> {
-              twManager.playerPlayPause()
+        when (mode) {
+            SourceEnum.DISK -> {
+                when (isPlaying()) {
+                    true -> pause()
+                    false -> resume()
+                }
+            }
+            SourceEnum.BT -> {
+                twManager.playerPlayPause()
 
-              Log.i("PoP", "play or pause")
-          }
-          SourceEnum.AUX -> TODO()
-      }
-      return isPlaying()
+                Log.i("PoP", "play or pause")
+            }
+            SourceEnum.AUX -> TODO()
+        }
+        return isPlaying()
     }
 
-    private fun updateMusicName(title: String, artist: String, duration: String){
+    private fun updateMusicName(title: String, artist: String, duration: String) {
         _title.value = title
         _artist.value = artist
     }
 
     override fun getMusicImg(albumID: Long) {
-        if (getMusicCover.isActive())
-            getMusicCover.unsubscribe()
+        /*if (getMusicCover.is)
+            getMusicCover.unsubscribe()*/
 
         getMusicCover(GetMusicCover.Params(albumID)) {
             "Cover loaded: $it".easyLog(this)
@@ -240,41 +243,33 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     }
 
     private fun updateSeekBar() {
-      val duration = mediaPlayer.duration
+        val duration = mediaPlayer.duration
         myViewModel.onUpdateSeekBar(duration)
     }
 
-    override fun previousTrack(context: Context) {
-        when(mode){
-            SourceEnum.DISK->{
-                when (currentTrackPosition + 1) {
-                    tracks.size -> currentTrackPosition = 0
-                    else -> currentTrackPosition++
-                }
-                testPlay(tracks[currentTrackPosition])
-                when (isPlaying()) {
-                    true -> mediaPlayer.start()
+
+    override fun previousTrack() {
+        when (mode) {
+            SourceEnum.DISK -> {
+                if (tracks.isEmpty()) {
+
+                } else {
+                    when (currentTrackPosition + 1) {
+                        tracks.size -> currentTrackPosition = 0
+                        else -> currentTrackPosition++
+                    }
+                    testPlay(tracks[currentTrackPosition])
+                    when (isPlaying()) {
+                        true -> mediaPlayer.start()
+                    }
                 }
             }
-            SourceEnum.BT->{
+            SourceEnum.BT -> {
                 twManager.playerPrev()
             }
             SourceEnum.AUX -> TODO()
         }
 
-    }
-
-
-
-   fun previousTrack() {
-        when (currentTrackPosition + 1) {
-            tracks.size -> currentTrackPosition = 0
-            else -> currentTrackPosition++
-        }
-        testPlay(tracks[currentTrackPosition])
-        when (isPlaying()) {
-            true -> mediaPlayer.start()
-        }
     }
 
 
@@ -287,43 +282,49 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
-    override fun nextTrack(context: Context) {
-        when(mode){
-            SourceEnum.DISK->{
-                when (currentTrackPosition - 1) {
-                    -1 -> currentTrackPosition = tracks.size - 1
-                    else -> currentTrackPosition--
+
+    override fun nextTrack() {
+        when (mode) {
+            SourceEnum.DISK -> {
+                if (tracks.isEmpty()) {
+
+                } else {
+                    when (currentTrackPosition - 1) {
+                        -1 -> currentTrackPosition = tracks.size - 1
+                        else -> currentTrackPosition--
+                    }
+                    testPlay(tracks[currentTrackPosition])
+                    when (isPlaying()) {
+                        true -> mediaPlayer.start()
+                    }
                 }
-                testPlay(tracks[currentTrackPosition])
-                when (isPlaying()) {
-                    true -> mediaPlayer.start()
-                }
+
             }
-            SourceEnum.BT->{
+            SourceEnum.BT -> {
                 twManager.playerNext()
                 //updateMusicName(name,artist,duration)
             }
-            SourceEnum.AUX->{
+            SourceEnum.AUX -> {
 
             }
         }
-
     }
 
-   fun nextTrack() {
-        when (currentTrackPosition - 1) {
-            -1 -> currentTrackPosition = tracks.size - 1
-            else -> currentTrackPosition--
-        }
-        testPlay(tracks[currentTrackPosition])
-        when (isPlaying()) {
-            true -> mediaPlayer.start()
+    private val widgetIntentReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val command = intent.getStringExtra(EXTRA_APP_WIDGET_NAME)
+            val ids = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
+            if (command != null) {
+
+            }
         }
     }
 
     override fun onCreate() {
         super.onCreate()
         (application as BaseApplication).getComponent<MusicComponent>().inject(this)
+
+        registerReceiver(widgetIntentReceiver, IntentFilter(APP_WIDGET_UPDATE))
         updateTracks(mediaManager)
         initMediaPlayer()
         startForeground()
@@ -335,8 +336,8 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         if (intent != null) {
             when (intent.action) {
                 ACTION_TOGGLE_PAUSE -> playOrPause()
-                ACTION_NEXT-> nextTrack()
-                ACTION_PREV-> previousTrack()
+                ACTION_NEXT -> nextTrack()
+                ACTION_PREV -> previousTrack()
             }
         }
 
@@ -352,7 +353,7 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
                 ""
             }
 
-        val notificationBuilder = NotificationCompat.Builder(this, channelId )
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
         val notification = notificationBuilder.setOngoing(true)
             .setSmallIcon(R.mipmap.sym_def_app_icon)
             .setPriority(PRIORITY_MIN)
@@ -362,9 +363,11 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(channelId: String, channelName: String): String{
-        val chan = NotificationChannel(channelId,
-            channelName, NotificationManager.IMPORTANCE_NONE)
+    private fun createNotificationChannel(channelId: String, channelName: String): String {
+        val chan = NotificationChannel(
+            channelId,
+            channelName, NotificationManager.IMPORTANCE_NONE
+        )
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -391,20 +394,25 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     }
 
     override fun sourceSelection(action: SourceEnum) {
-        when(action){
-            SourceEnum.BT-> startBtMode()
-            SourceEnum.DISK-> startDiskMode()
+        when (action) {
+            SourceEnum.BT -> startBtMode()
+            SourceEnum.DISK -> startDiskMode()
             SourceEnum.AUX -> TODO()
         }
     }
+
 
     override fun getMusicName(): StateFlow<String> = title
 
     override fun getArtistName(): StateFlow<String> = artist
 
+    override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
+    override fun updateWidget(): StateFlow<Boolean> =isNotConnected
+
     override fun onCompletion(mp: MediaPlayer?) {
 
     }
+
 
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         "BT Player state = $isPlaying".easyLog(this)

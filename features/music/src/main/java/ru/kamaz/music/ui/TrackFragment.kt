@@ -37,10 +37,6 @@ class TrackFragment :
 
     private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
         .addProducer(MusicListViewHolderProducer())
-        .build()
-
-
-
-
+        .build { it }
 }
 

@@ -23,8 +23,6 @@ abstract class AsyncUseCase<out Type, in Params, out Failure> {
         }
     }
 
-    fun isActive() = parentJob.isActive
-
     fun unsubscribe() {
         parentJob.apply {
             cancelChildren()

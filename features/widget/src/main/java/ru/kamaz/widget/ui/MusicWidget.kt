@@ -1,17 +1,17 @@
 package ru.kamaz.widget.ui
 
 import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicService.Companion.ACTION_NEXT
 import ru.kamaz.music.services.MusicService.Companion.ACTION_PREV
@@ -19,7 +19,7 @@ import ru.kamaz.music.services.MusicService.Companion.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.widget.R
 import ru.kamaz.widget.ui.base.BaseAppWidget
-import ru.kamaz.widget.view_model.WidgetViewModel
+import ru.sir.presentation.extensions.launchWhenStarted
 
 
 /**
@@ -27,22 +27,26 @@ import ru.kamaz.widget.view_model.WidgetViewModel
  */
 class MusicWidget :BaseAppWidget(), MusicServiceInterface.ViewModel, ServiceConnection {
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private var service: MusicServiceInterface.Service? = null
+    private var service2: MusicServiceInterface.Service? = null
 
+    private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
+    val service = _service.asStateFlow()
+    val artist: StateFlow<String> by lazy { service.value?.getArtistName() ?: MutableStateFlow("amigos") }
+
+    val title: StateFlow<String> by lazy { service.value?.getMusicName() ?: MutableStateFlow("diaz") }
 
 
 
     override fun onReceive(context: Context?, intent: Intent?) {
         super.onReceive(context, intent)
-        Log.i("widget", "onStartCommand: resiverstart")
+        Log.i("ttt", "onStartCommand: resiverstart")
         if (intent != null) {
-            Log.i("widget", "onStartCommand: nenull")
+            Log.i("ttt", "onStartCommand: nenull")
             when (intent.action) {
 
                 ACTION_TOGGLE_PAUSE -> {
-                    Log.i("widget", "onStartCommand: play")
+                    Log.i("ttt", "onStartCommand: play")
                 }
-
 
             }
         }
@@ -56,28 +60,32 @@ class MusicWidget :BaseAppWidget(), MusicServiceInterface.ViewModel, ServiceConn
 
     }
 
-
-
     override fun defaultAppWidget(context: Context, appWidgetIds: IntArray) {
         val appWidgetView = RemoteViews(context.packageName, R.layout.music_widget)
         linkButtons(context, appWidgetView)
         pushUpdate(context, appWidgetIds, appWidgetView)
+        appWidgetView.setTextViewText(R.id.music_name,title.toString())
+        appWidgetView.setTextViewText(R.id.artist_name,artist.toString())
     }
 
     override fun performUpdate(service: MusicService, appWidgetIds: IntArray?) {
         val appWidgetView = RemoteViews(service.packageName, R.layout.music_widget)
+        appWidgetView.setTextViewText(R.id.music_name,title.value)
+        Log.i("didi", "${title.value}")
+        appWidgetView.setTextViewText(R.id.artist_name,artist.value)
+
+        Log.i("didi", "${artist.value}")
+
         linkButtons(service, appWidgetView)
+
+        pushUpdate(service.applicationContext,appWidgetIds,appWidgetView)
+
+
 
     }
 
-
-    fun updateAppWidget(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int
-    ) {
-        val views = RemoteViews(context.packageName, R.layout.music_widget)
-        appWidgetManager.updateAppWidget(appWidgetId, views)
+    fun updateWidget(){
+        MusicWidget.Companion.instance
     }
 
     private fun linkButtons(context: Context, views: RemoteViews) {
@@ -92,8 +100,12 @@ class MusicWidget :BaseAppWidget(), MusicServiceInterface.ViewModel, ServiceConn
 
         pendingIntent = buildPendingIntent(context, ACTION_PREV, serviceName)
         views.setOnClickPendingIntent(R.id.prev_widget, pendingIntent)
-
-
+        views.setTextViewText(R.id.music_name,title.value)
+        views.setTextViewText(R.id.artist_name,artist.value)
+        Log.i("linkBTN", "linkBTN")
+          updateWidget()
+    /*    views.setString(R.id.music_name, ACTION_NEXT, title.toString())
+        views.setString(R.id.artist_name, ACTION_NEXT, artist.toString())*/
     }
 
     companion object {
@@ -143,13 +155,13 @@ class MusicWidget :BaseAppWidget(), MusicServiceInterface.ViewModel, ServiceConn
 
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Log.i("serWStart", "onServiceConnected: po")
-        this.service = (service as MusicService.MyBinder).getService()
-        this.service?.setViewModel(this)
+     Log.i("serWStart", "onServiceConnected: po")
+        this.service2 = (service as MusicService.MyBinder).getService()
+        this.service2?.setViewModel(this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        service = null
+    service2 = null
     }
 
 

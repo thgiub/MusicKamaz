@@ -86,7 +86,6 @@ abstract class BaseAppWidget : AppWidgetProvider(){
 
 
 
-
     companion object {
 
         const val NAME: String = "app_widget"
