@@ -10,34 +10,15 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.RemoteViews
-import ru.kamaz.music.services.MusicService
-import ru.kamaz.music.services.MusicService.Companion.APP_WIDGET_UPDATE
-import ru.kamaz.music.services.MusicService.Companion.EXTRA_APP_WIDGET_NAME
-import ru.kamaz.music.services.MusicService.Companion.META_CHANGED
-import ru.kamaz.music.services.MusicService.Companion.PLAY_STATE_CHANGED
-
 
 abstract class BaseAppWidget : AppWidgetProvider(){
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        defaultAppWidget(context, appWidgetIds)
-        val updateIntent = Intent(APP_WIDGET_UPDATE)
-        updateIntent.putExtra(EXTRA_APP_WIDGET_NAME, NAME)
-        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-        updateIntent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY)
-        context.sendBroadcast(updateIntent)
-    }
-
-
-    fun notifyChange(service: MusicService, what: String) {
-        if (hasInstances(service)) {
-            if (META_CHANGED == what || PLAY_STATE_CHANGED == what) {
-                performUpdate(service, null)
-            }
-        }
+        performUpdate(context, appWidgetIds)
     }
 
     protected fun pushUpdate(
@@ -80,11 +61,7 @@ abstract class BaseAppWidget : AppWidgetProvider(){
         }
     }
 
-    protected abstract fun defaultAppWidget(context: Context, appWidgetIds: IntArray)
-
-    abstract fun performUpdate(service: MusicService, appWidgetIds: IntArray?)
-
-
+    abstract fun performUpdate(context: Context, appWidgetIds: IntArray?)
 
     companion object {
 

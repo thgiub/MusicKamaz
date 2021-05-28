@@ -16,6 +16,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
@@ -25,16 +26,23 @@ import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music_api.BaseConstants.ACTION_NEXT
+import ru.kamaz.music_api.BaseConstants.ACTION_PREV
+import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
+import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
+import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
 import ru.kamaz.music_api.interactor.GetMusicCover
 import ru.kamaz.music_api.interactor.GetMusicPosition
 import ru.kamaz.music_api.models.Track
+import ru.kamaz.widget.ui.MusicWidget
 import ru.sir.core.Either
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.easyLog
+import ru.sir.presentation.extensions.launchOn
 import javax.inject.Inject
 
 
-class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
+class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
     BluetoothManagerListener {
 
     val twManager = BluetoothManager()
@@ -42,17 +50,8 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     private val _isNotConnected = MutableStateFlow(true)
     val isNotConnected = _isNotConnected.asStateFlow()
 
-    companion object {
-
-        const val ACTION_TOGGLE_PAUSE = "play"
-        const val ACTION_NEXT = "next"
-        const val ACTION_PREV = "prev"
-        const val APP_WIDGET_UPDATE = ".appwidgetupdate"
-        const val EXTRA_APP_WIDGET_NAME = "ru.kamaz.musickamaz"
-        const val META_CHANGED = ".metachanged"
-        const val PLAY_STATE_CHANGED = ".playstatechanged"
-    }
-
+    private var lifecycleJob = Job()
+    private lateinit var lifecycleScope: CoroutineScope
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -66,6 +65,7 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
     @Inject
     lateinit var getMusicPosition: GetMusicPosition
 
+    private val widget = MusicWidget.instance
 
     lateinit var myViewModel: MusicServiceInterface.ViewModel
 
@@ -328,6 +328,38 @@ class MusicService() : Service(), MusicServiceInterface.Service, MediaPlayer.OnC
         updateTracks(mediaManager)
         initMediaPlayer()
         startForeground()
+
+        initLifecycleScope()
+
+        artist.launchOn(lifecycleScope) {
+            widget.updateArtist(this, it)
+
+//            val appWidgetManager = AppWidgetManager.getInstance(this.applicationContext)
+//            val ids = appWidgetManager.getAppWidgetIds(ComponentName(applicationContext, MusicWidget::class.java))
+//
+//            for (id in ids) {
+//                appWidgetManager.updateAppWidget(ComponentName(applicationContext, MusicWidget::class.java), RemoteViews(applicationContext.packageName, MusicWidget.appWidgetViewId))
+//            }
+        }
+    }
+
+    private fun initLifecycleScope() {
+        unsubscribeLifecycleScope()
+
+        lifecycleJob = Job()
+        lifecycleScope = CoroutineScope(Dispatchers.Main + lifecycleJob)
+    }
+
+    fun unsubscribeLifecycleScope() {
+        lifecycleJob.apply {
+            cancelChildren()
+            cancel()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unsubscribeLifecycleScope()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
