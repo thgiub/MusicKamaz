@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toStartOf="@+id/add_to_folder"
         app:layout_constraintStart_toEndOf="@id/rotate"
         app:layout_constraintTop_toTopOf="@+id/rotate"
-        app:srcCompat="@drawable/ic_play" />
+        app:srcCompat="@drawable/ic_play2" />
 
     <ImageView
         android:id="@+id/add_to_folder"

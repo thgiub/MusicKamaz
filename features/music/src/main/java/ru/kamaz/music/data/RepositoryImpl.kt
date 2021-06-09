@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import ru.kamaz.music.TestDBDao
 import ru.kamaz.music_api.interfaces.Repository
 
 import ru.kamaz.music_api.models.Track
@@ -11,7 +12,7 @@ import ru.sir.core.Either
 import ru.sir.core.None
 
 
-class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: MediaPlayer): Repository {
+class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: MediaPlayer, private val testDBDao: TestDBDao): Repository {
     override fun loadData(): Either<None, List<Track>> = media.scanTracks()
     override fun getMusicCover(albumId: Long): Either<None, String> = media.getAlbumImagePath(albumId)
 
@@ -22,4 +23,6 @@ class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: M
             delay(1000)
         }
     }
+
+    override fun testGetData(): String = testDBDao.testGetQuery()
 }

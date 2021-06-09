@@ -1,8 +1,10 @@
 package ru.kamaz.widget.ui
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import android.widget.RemoteViews
 import ru.kamaz.music_api.BaseConstants.ACTION_NEXT
@@ -16,11 +18,22 @@ import ru.kamaz.widget.ui.base.BaseAppWidget
  * Implementation of App Widget functionality.
  */
 class MusicWidget : BaseAppWidget() {
-
+    private var pendingIntent: PendingIntent? = null
     override fun performUpdate(context: Context, appWidgetIds: IntArray?) {
         val appWidgetView = RemoteViews(context.packageName, R.layout.music_widget)
 
-        //appWidgetView.setTextViewText(R.id.music_name, artist)
+        val manager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+
+        if (pendingIntent == null) {
+
+        }
+        manager.setRepeating(
+            AlarmManager.ELAPSED_REALTIME,
+            SystemClock.elapsedRealtime(),
+            60000,
+            pendingIntent
+        )
 
         linkButtons(context, appWidgetView)
         pushUpdate(context, appWidgetIds, appWidgetView)
@@ -30,6 +43,13 @@ class MusicWidget : BaseAppWidget() {
         val appWidgetView = RemoteViews(context.packageName, R.layout.music_widget)
 
         appWidgetView.setTextViewText(R.id.music_name, artist)
+
+        pushUpdate(context, null, appWidgetView)
+    }
+    fun updateTitle(context: Context, title: String) {
+        val appWidgetView = RemoteViews(context.packageName, R.layout.music_widget)
+
+        appWidgetView.setTextViewText(R.id.artist_name, title)
 
         pushUpdate(context, null, appWidgetView)
     }

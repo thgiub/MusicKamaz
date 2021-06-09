@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
@@ -62,7 +63,6 @@ class MusicFragment :
         }
         binding.sourceSelection.btnBt.setOnClickListener {
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-              btModeActivation()
         }
         binding.sourceSelection.disk.setOnClickListener {
                 viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
@@ -133,6 +133,23 @@ class MusicFragment :
             binding.seek.progress = currentPosition
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
         }
+
+        viewModel.btModeActivation.launchWhenStarted(lifecycleScope){
+            Log.i("btModeActivation", "btModeActivation")
+           btModeActivation()
+        }
+
+        viewModel.isNotConnected.launchWhenStarted(lifecycleScope){
+            if (it){
+                Log.i("bt_frag_isNotConnected", "bt on")
+               // viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
+                diskModeActivation()
+            }else{
+                Log.i("bt_frag_isNotConnected", "bt off")
+                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+                btModeActivation()
+            }
+        }
     }
 
     private fun updateTrackCover(coverPath: String) {
@@ -166,6 +183,7 @@ class MusicFragment :
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
+        //viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
     }
 
     fun diskModeActivation(){
@@ -186,6 +204,7 @@ class MusicFragment :
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+     //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
     }
     fun auxModeActivation(){
         changeSource(binding.controlPanel.pop)

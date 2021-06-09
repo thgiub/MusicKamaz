@@ -164,7 +164,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/controlPanel"
-            app:srcCompat="@drawable/ic_folder_music" />
+            app:srcCompat="@drawable/ic_music_nota" />
 
         <include
             android:id="@+id/controlPanel"

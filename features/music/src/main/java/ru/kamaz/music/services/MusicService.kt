@@ -26,6 +26,7 @@ import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.ui.TestWidget
 import ru.kamaz.music_api.BaseConstants.ACTION_NEXT
 import ru.kamaz.music_api.BaseConstants.ACTION_PREV
 import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
@@ -66,16 +67,20 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     lateinit var getMusicPosition: GetMusicPosition
 
     private val widget = MusicWidget.instance
+    private val widgettest = TestWidget.instance
+
 
     lateinit var myViewModel: MusicServiceInterface.ViewModel
 
 
     override fun onDeviceConnected() {
         _isNotConnected.value = false
+        Log.i("bt_serv", "onDeviceConnected ${_isNotConnected.value} ")
     }
 
     override fun onDeviceDisconnected() {
         _isNotConnected.value = true
+        Log.i("bt_serv", "onDeviceConnected ${_isNotConnected.value} ")
     }
 
     inner class MyBinder : Binder() {
@@ -97,6 +102,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _artist = MutableStateFlow("Unknown")
     val artist = _artist.asStateFlow()
 
+    private val _duration = MutableStateFlow("00:00")
+    val duration = _duration.asStateFlow()
+
     private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
     val tickFlow: MutableSharedFlow<Unit> = _tickFlow
 
@@ -110,7 +118,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun init() {
-        TODO("Not yet implemented")
+
+
     }
 
     enum class SourceEnum(val value: Int) {
@@ -125,18 +134,22 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     fun startBtMode() {
+
+     /*   twManager.startMonitoring(applicationContext) {
+            twManager.addListener(this)
+            twManager.requestConnectionInfo()
+            Log.i("init", "listener_work")
+        }*/
         myViewModel.selectBtMode()
         this.mode = SourceEnum.BT
         stopMediaPlayer()
-        twManager.startMonitoring(applicationContext) {
-            twManager.addListener(this)
-            twManager.requestConnectionInfo()
-        }
+        Log.i("bt_startBtMode", "work")
+
     }
 
     fun startDiskMode() {
         this.mode = SourceEnum.DISK
-        stopBtListener()
+       // stopBtListener()
     }
 
 
@@ -209,11 +222,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private fun updateMusicName(title: String, artist: String, duration: String) {
         _title.value = title
         _artist.value = artist
+        _duration.value=duration
     }
 
     override fun getMusicImg(albumID: Long) {
-        /*if (getMusicCover.is)
-            getMusicCover.unsubscribe()*/
+
 
         getMusicCover(GetMusicCover.Params(albumID)) {
             "Cover loaded: $it".easyLog(this)
@@ -330,16 +343,21 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         startForeground()
 
         initLifecycleScope()
+        Log.i("init", "listener_work")
+        twManager.startMonitoring(applicationContext) {
+            twManager.addListener(this)
+            twManager.requestConnectionInfo()
+            Log.i("init", "listener_work")
+        }
 
         artist.launchOn(lifecycleScope) {
-            widget.updateArtist(this, it)
-
-//            val appWidgetManager = AppWidgetManager.getInstance(this.applicationContext)
-//            val ids = appWidgetManager.getAppWidgetIds(ComponentName(applicationContext, MusicWidget::class.java))
-//
-//            for (id in ids) {
-//                appWidgetManager.updateAppWidget(ComponentName(applicationContext, MusicWidget::class.java), RemoteViews(applicationContext.packageName, MusicWidget.appWidgetViewId))
-//            }
+            widgettest.updateTestArtist(this, it)
+        }
+        title.launchOn(lifecycleScope) {
+            widgettest.updateTestTitle(this, it)
+        }
+        duration.launchOn(lifecycleScope) {
+            widgettest.updateTestDuration(this, it)
         }
     }
 
@@ -427,7 +445,16 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun sourceSelection(action: SourceEnum) {
         when (action) {
-            SourceEnum.BT -> startBtMode()
+            SourceEnum.BT ->{
+                if(isNotConnected.value){
+                    Log.i("bt_serv", "bt off")
+
+                }else{
+                    Log.i("bt_serv", "bt on")
+                    startBtMode()
+                }
+
+            }
             SourceEnum.DISK -> startDiskMode()
             SourceEnum.AUX -> TODO()
         }
@@ -437,6 +464,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun getMusicName(): StateFlow<String> = title
 
     override fun getArtistName(): StateFlow<String> = artist
+
+    override fun getMusicDuration(): StateFlow<String> = duration
+
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun updateWidget(): StateFlow<Boolean> =isNotConnected

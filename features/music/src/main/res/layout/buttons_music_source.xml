@@ -1,4 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+ <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/pap"
     android:orientation="horizontal"
     android:layout_marginTop="@dimen/marginTop"

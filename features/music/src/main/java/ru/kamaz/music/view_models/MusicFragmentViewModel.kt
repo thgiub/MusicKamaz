@@ -1,10 +1,12 @@
-         package ru.kamaz.music.view_models
+package ru.kamaz.music.view_models
 
 import android.app.Application
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
@@ -13,37 +15,44 @@ import kotlinx.coroutines.flow.*
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
-import ru.kamaz.music_api.interactor.GetMusicCover
 import ru.kamaz.music_api.interactor.GetMusicPosition
-import ru.kamaz.music_api.interactor.LoadData
+import ru.kamaz.music_api.interfaces.Repository
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.presentation.base.BaseViewModel
-import ru.sir.presentation.extensions.easyLog
-import ru.sir.presentation.extensions.launchOn
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
     private val mediaPlayer: MediaPlayer,
     private val mediaManager: MediaManager,
     private val getMusicPosition: GetMusicPosition
-) : BaseViewModel(application),MediaPlayer.OnCompletionListener, ServiceConnection,MusicServiceInterface.ViewModel {
+) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
+    MusicServiceInterface.ViewModel {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
 
     private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
     val isPlaying = _isPlaying.asStateFlow()
+    private val _btModeActivation = MutableStateFlow(true)
+    val btModeActivation = _btModeActivation.asStateFlow()
 
-    val artist: StateFlow<String> by lazy { service.value?.getArtistName() ?: MutableStateFlow("Unknown") }
+    val artist: StateFlow<String> by lazy {
+      service.value?.getArtistName() ?: MutableStateFlow("Unknown")
+    }
 
-    val title: StateFlow<String> by lazy { service.value?.getMusicName() ?: MutableStateFlow("Unknown") }
+    val title: StateFlow<String> by lazy {
+        service.value?.getMusicName() ?: MutableStateFlow("Unknown")
+    }
 
-    val isNotConnected: StateFlow<Boolean> by lazy { service.value?.checkDeviceConnection() ?: MutableStateFlow(true) }
+    val isNotConnected: StateFlow<Boolean> by lazy {
+        service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
+    }
+
+
 
     private val _duration = MutableStateFlow("--:--")
-    val duration= _duration.asStateFlow()
+    val duration = _duration.asStateFlow()
 
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
@@ -52,16 +61,12 @@ class MusicFragmentViewModel @Inject constructor(
     val mode = _mode.asStateFlow()
 
 
-
-
-
-
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
 
-
-    var musicPosition: StateFlow<Int> = getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
+    var musicPosition: StateFlow<Int> =
+        getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
     private val _maxSeek = MutableStateFlow(0)
     val maxSeek = _maxSeek.asStateFlow()
@@ -85,15 +90,15 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun onCreate() {
-        updateTracks(   mediaManager)
+        updateTracks(mediaManager)
         super.onCreate()
     }
 
-    fun startTrack(){
-        if(tracks.isEmpty()){
+    fun startTrack() {
+        if (tracks.isEmpty()) {
             musicEmpty()
-        }else
-        service.value?.testPlay(tracks[currentTrackPosition])
+        } else
+            service.value?.testPlay(tracks[currentTrackPosition])
     }
 
     fun playOrPause() {
@@ -101,25 +106,16 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
 
-    fun checkPosition(position: Int){
-         service.value?.checkPosition(position)
+    fun checkPosition(position: Int) {
+        service.value?.checkPosition(position)
     }
 
     fun previousTrack() {
-
-     /*   if(tracks.isEmpty()){
-            musicEmpty()
-        }else*/
         service.value?.previousTrack()
     }
 
     fun nextTrack() {
-
-
-    /*    if(tracks.isEmpty()){
-            musicEmpty()
-        }else*/
-      service.value?.nextTrack()
+        service.value?.nextTrack()
     }
 
     fun updateTracks(mediaManager: MediaManager) {
@@ -129,26 +125,22 @@ class MusicFragmentViewModel @Inject constructor(
         }
     }
 
-    fun vmSourceSelection(action:MusicService.SourceEnum){
-        when(action){
-           MusicService.SourceEnum.BT->{
-           if (isNotConnected.value){
-               service.value?.sourceSelection(action)
-           } else{
-               Toast.makeText(context,"Подключите Устройство", Toast.LENGTH_SHORT)
-           }
+    fun vmSourceSelection(action: MusicService.SourceEnum) {
+        when (action) {
+            MusicService.SourceEnum.BT -> {
+                service.value?.sourceSelection(action)
+                Log.d("bt_vm_musFrag", "work")
+            }
 
-           }
-
-           MusicService.SourceEnum.DISK->{
-               service.value?.sourceSelection(action)
-           }
+            MusicService.SourceEnum.DISK -> {
+                service.value?.sourceSelection(action)
+            }
 
         }
 
     }
 
-    fun musicEmpty(){
+    fun musicEmpty() {
         Toast.makeText(context, "нет песен", Toast.LENGTH_LONG).show()
     }
 
@@ -156,9 +148,9 @@ class MusicFragmentViewModel @Inject constructor(
         nextTrack()
     }
 
-   override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-       Log.d("serWStart", "onServiceConnected: TRACK-VM")
-       _service.value = (service as MusicService.MyBinder).getService()
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Log.d("serWStart", "onServiceConnected: TRACK-VM")
+        _service.value = (service as MusicService.MyBinder).getService()
         this.service.value?.setViewModel(this)
     }
 
@@ -187,12 +179,18 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun selectBtMode() {
-
+  /*    if (isNotConnected.value){
+          Log.d("bt_isConnected", "true")
+      }else{
+          Log.d("bt_isConnected", "false")
+      }*/
+        Log.d("bt_diaz", "${isNotConnected.value}")
+        _btModeActivation.value = isNotConnected.value
     }
 
-   /* override fun selectMode(action: MusicService.sourceEnum) {
-        _mode.value = action.toString()
-    }*/
+    /* override fun selectMode(action: MusicService.sourceEnum) {
+         _mode.value = action.toString()
+     }*/
 
 
     override fun onResume() {

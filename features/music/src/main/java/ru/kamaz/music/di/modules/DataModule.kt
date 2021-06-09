@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import dagger.Module
 import dagger.Provides
+import ru.kamaz.music.TestDBDatabase
 import ru.kamaz.music.media.AppMediaManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.data.RepositoryImpl
@@ -22,5 +23,5 @@ class DataModule {
     fun provideMediaPlayer(): MediaPlayer = MediaPlayer()
 
     @Provides
-    fun provideRepository(media: MediaManager, mediaPlayer: MediaPlayer): Repository = RepositoryImpl(media, mediaPlayer)
+    fun provideRepository(media: MediaManager, mediaPlayer: MediaPlayer, testDBDatabase: TestDBDatabase): Repository = RepositoryImpl(media, mediaPlayer, testDBDatabase.testDBDao())
 }

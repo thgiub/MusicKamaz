@@ -33,6 +33,7 @@
         <item name="appWidgetTextColor">@color/light_blue_50</item>
 
     </style>
+
     <style name="test" parent="">
         <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
         <item name="appWidgetTextColor">@color/light_blue_50</item>
@@ -44,6 +45,7 @@
         <item name="android:padding">@dimen/control_btn_padding</item>
         <item name="android:background">@drawable/ic_btn_background</item>
     </style>
+
     <style name="Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
@@ -66,5 +68,10 @@
 
     <style name="controlButtonBigBlue" parent="controlButtonBig">
         <item name="android:background">@drawable/ic_btn_background_blue</item>
+    </style>
+
+    <style name="ThemeOverlay.MusicKamaz.AppWidgetContainer" parent="">
+        <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
+        <item name="appWidgetTextColor">@color/light_blue_50</item>
     </style>
 </resources>
