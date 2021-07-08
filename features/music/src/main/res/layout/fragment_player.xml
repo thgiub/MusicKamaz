@@ -14,7 +14,6 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:foreground="@drawable/test2"
-        android:src="@drawable/default_img_music"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,14 +33,27 @@
         app:layout_constraintVertical_weight="8">
 
         <ImageView
-            style="@style/controlButtonBig"
             android:id="@+id/prev"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            style="@style/controlButtonBig"
             app:layout_constraintEnd_toStartOf="@id/next"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/ic_prew_music" />
+
+        <TextView
+            android:id="@+id/text_usb"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="USB"
+            android:textColor="@color/white"
+            android:gravity="center_vertical"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/prev" />
 
         <ImageView
             android:id="@+id/next"

@@ -18,6 +18,7 @@ class MainActivity : BaseActivity() {
         when (action.id) {
             NavAction.OPEN_TRACK_LIST_FRAGMENT-> {navigator.navigate(R.id.trackFragment)}
             NavAction.OPEN_BT_FRAGMENT-> {navigator.navigate(R.id.btFragment)}
+            NavAction.OPEN_TEST_FRAGMENT-> {navigator.navigate(R.id.testFragment)}
         }
     }
 

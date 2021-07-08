@@ -12,6 +12,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
+import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
+import ru.biozzlab.twmanager.managers.MusicManager
+import ru.biozzlab.twmanager.utils.easyLog
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
@@ -28,15 +31,14 @@ class MusicFragmentViewModel @Inject constructor(
     private val mediaManager: MediaManager,
     private val getMusicPosition: GetMusicPosition
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
-    MusicServiceInterface.ViewModel {
+    MusicServiceInterface.ViewModel,MusicManagerListener {
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
 
     private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
     val isPlaying = _isPlaying.asStateFlow()
-    private val _btModeActivation = MutableStateFlow(true)
+    private val _btModeActivation = MutableStateFlow(false)
     val btModeActivation = _btModeActivation.asStateFlow()
-
     val artist: StateFlow<String> by lazy {
       service.value?.getArtistName() ?: MutableStateFlow("Unknown")
     }
@@ -49,7 +51,9 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
     }
 
-
+    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
+        service.value?.checkUSBConnection() ?: MutableStateFlow(true)
+    }
 
     private val _duration = MutableStateFlow("--:--")
     val duration = _duration.asStateFlow()
@@ -64,7 +68,6 @@ class MusicFragmentViewModel @Inject constructor(
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
-
     var musicPosition: StateFlow<Int> =
         getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
@@ -75,7 +78,6 @@ class MusicFragmentViewModel @Inject constructor(
         mediaPlayer.release()
         super.onDestroy()
     }
-
 
     override fun init() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
@@ -101,6 +103,13 @@ class MusicFragmentViewModel @Inject constructor(
             service.value?.testPlay(tracks[currentTrackPosition])
     }
 
+    fun firstOpenTrackFound(){
+        if (tracks.isEmpty()) {
+            musicEmpty()
+        } else
+            Log.i("222", "$tracks[currentTrackPosition] ")
+
+    }
     fun playOrPause() {
         _isPlaying.value = service.value?.playOrPause() ?: false
     }
@@ -129,7 +138,7 @@ class MusicFragmentViewModel @Inject constructor(
         when (action) {
             MusicService.SourceEnum.BT -> {
                 service.value?.sourceSelection(action)
-                Log.d("bt_vm_musFrag", "work")
+                Log.d("test", "vmSourceSelection")
             }
 
             MusicService.SourceEnum.DISK -> {
@@ -166,10 +175,6 @@ class MusicFragmentViewModel @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    /* override fun onUpdateSeek(progress:StateFlow<Int>) {
-         this.musicPosition= progress
-     }*/
-
     override fun onCheckPosition(position: Int) {
         TODO("Not yet implemented")
     }
@@ -178,28 +183,20 @@ class MusicFragmentViewModel @Inject constructor(
         _maxSeek.value = duration
     }
 
+
+    override fun onSdStatusChanged(path: String, isAdded: Boolean) {
+        "MicroSD status changed: value = $path status = $isAdded".easyLog(this)
+    }
+
+    override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
+        "USB status changed: value = $path status = $isAdded".easyLog(this)
+    }
+
     override fun selectBtMode() {
-  /*    if (isNotConnected.value){
-          Log.d("bt_isConnected", "true")
-      }else{
-          Log.d("bt_isConnected", "false")
-      }*/
-        Log.d("bt_diaz", "${isNotConnected.value}")
-        _btModeActivation.value = isNotConnected.value
+        Log.d("test", "${_btModeActivation.value}")
+        _btModeActivation.value = true
+        Log.d("test", "${_btModeActivation.value}")
     }
 
-    /* override fun selectMode(action: MusicService.sourceEnum) {
-         _mode.value = action.toString()
-     }*/
 
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("serWStart", "onResume: VM")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d("serWStart", "onStop: VM")
-    }
 }

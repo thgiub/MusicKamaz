@@ -24,7 +24,6 @@ class MusicWidget : BaseAppWidget() {
 
         val manager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-
         if (pendingIntent == null) {
 
         }
