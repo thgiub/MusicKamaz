@@ -1,6 +1,5 @@
 package ru.kamaz.music.ui
 
-import android.bluetooth.BluetoothManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +14,7 @@ import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.services.MusicService
-import ru.kamaz.music.ui.NavAction.OPEN_BT_FRAGMENT
+import ru.kamaz.music.ui.NavAction.OPEN_TEST_FRAGMENT
 
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 
@@ -34,7 +33,11 @@ class MusicFragment :
         app.getComponent<MusicComponent>().inject(this)
     }
 
-    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+    override fun initBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) =
         FragmentPlayerBinding.inflate(inflater, container, false)
 
     override fun setListeners() {
@@ -42,12 +45,10 @@ class MusicFragment :
             viewModel.nextTrack()
         }
 
-
         binding.controlPanel.playPause
             .setOnClickListener {
-            viewModel.playOrPause()
-
-        }
+                viewModel.playOrPause()
+            }
         binding.controlPanel.rotate.setOnClickListener {
             viewModel.startTrack()
         }
@@ -55,18 +56,19 @@ class MusicFragment :
             viewModel.previousTrack()
         }
         binding.openListFragment.setOnClickListener {
-            navigator.navigateTo(UiAction(OPEN_TRACK_LIST_FRAGMENT))
+            navigator.navigateTo(UiAction(OPEN_TEST_FRAGMENT))
         }
         binding.folder.setOnClickListener {
             changeSource(binding.controlPanel.pop)
             changeSource(binding.sourceSelection.pap)
-
         }
         binding.sourceSelection.btnBt.setOnClickListener {
+            Log.i("Test", "musicFragment")
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+            btModeActivation()
         }
         binding.sourceSelection.disk.setOnClickListener {
-                viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
+            viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
             diskModeActivation()
         }
         binding.sourceSelection.aux.setOnClickListener {
@@ -90,10 +92,10 @@ class MusicFragment :
         super.setListeners()
     }
 
-    fun changeSource(view: View){
-        view.visibility = if (view.visibility == View.VISIBLE){
+    fun changeSource(view: View) {
+        view.visibility = if (view.visibility == View.VISIBLE) {
             View.INVISIBLE
-        } else{
+        } else {
             View.VISIBLE
         }
     }
@@ -103,12 +105,14 @@ class MusicFragment :
             if (it == null) return@launchWhenStarted
             initServiceVars()
         }
+
+        viewModel.firstOpenTrackFound()
     }
 
     private fun initServiceVars() {
         viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
-            if (isPlaying)   binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_music)
-            else     binding.controlPanel.playPause.setImageResource(R.drawable.ic_play)
+            if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_music)
+            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play)
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {
@@ -135,20 +139,27 @@ class MusicFragment :
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
         }
 
-        viewModel.btModeActivation.launchWhenStarted(lifecycleScope){
-            Log.i("btModeActivation", "btModeActivation")
-           btModeActivation()
+        viewModel.btModeActivation.launchWhenStarted(lifecycleScope) {
+            Log.i("fragmentTest", "$it")
+            btModeActivation()
         }
 
-        viewModel.isNotConnected.launchWhenStarted(lifecycleScope){
-            if (it){
+        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
+            if (it) {
                 Log.i("bt_frag_isNotConnected", "bt on")
-               // viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
                 diskModeActivation()
-            }else{
+            } else {
                 Log.i("bt_frag_isNotConnected", "bt off")
                 viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
                 btModeActivation()
+            }
+        }
+
+        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope){
+            if (it) {
+                usbModeActivation()
+            } else {
+                diskModeActivation()
             }
         }
     }
@@ -157,9 +168,9 @@ class MusicFragment :
         Log.i("diaz", "IMG + $coverPath ")
 
         if (coverPath.isEmpty()) {
-            Picasso.with(context)
-                .load(R.drawable.png)
-                .into(binding.picture)
+            /* Picasso.with(context)
+                 .load(R.drawable.png)
+                 .into(binding.picture)*/
         } else {
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath)))
@@ -167,63 +178,96 @@ class MusicFragment :
         }
     }
 
-    fun btModeActivation(){
+    fun btModeActivation() {
         changeSource(binding.controlPanel.pop)
         changeSource(binding.sourceSelection.pap)
-        binding.controlPanel.repeat.visibility=View.INVISIBLE
-        binding.controlPanel.rotate.visibility=View.INVISIBLE
-        binding.controlPanel.star.visibility=View.INVISIBLE
-        binding.controlPanel.addToFolder.visibility=View.INVISIBLE
-        binding.controlPanel.playPause.visibility=View.VISIBLE
-        binding.openListFragment.visibility=View.INVISIBLE
-        binding.seek.visibility=View.INVISIBLE
-        binding.nextPrev.visibility=View.VISIBLE
-        binding.artist.visibility=View.VISIBLE
-        binding.song.visibility=View.VISIBLE
-        binding.times.visibility=View.INVISIBLE
+        binding.controlPanel.repeat.visibility = View.INVISIBLE
+        binding.controlPanel.rotate.visibility = View.INVISIBLE
+        binding.controlPanel.star.visibility = View.INVISIBLE
+        binding.controlPanel.addToFolder.visibility = View.INVISIBLE
+        binding.controlPanel.playPause.visibility = View.VISIBLE
+        binding.openListFragment.visibility = View.INVISIBLE
+        binding.seek.visibility = View.INVISIBLE
+        binding.nextPrev.visibility = View.VISIBLE
+        binding.artist.visibility = View.VISIBLE
+        binding.song.visibility = View.VISIBLE
+        binding.times.visibility = View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
-        //viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+        binding.picture.setBackgroundResource(R.drawable.bluetooth_back)
+        binding.textUsb.visibility= View.INVISIBLE
+
     }
 
-    fun diskModeActivation(){
+    fun diskModeActivation() {
         changeSource(binding.controlPanel.pop)
         changeSource(binding.sourceSelection.pap)
-        binding.controlPanel.addToFolder.visibility=View.VISIBLE
-        binding.controlPanel.repeat.visibility=View.VISIBLE
-        binding.controlPanel.rotate.visibility=View.VISIBLE
-        binding.controlPanel.star.visibility=View.VISIBLE
-        binding.controlPanel.playPause.visibility=View.VISIBLE
-        binding.openListFragment.visibility=View.VISIBLE
-        binding.controlPanel.addToFolder.visibility=View.VISIBLE
-        binding.seek.visibility=View.VISIBLE
-        binding.nextPrev.visibility=View.VISIBLE
-        binding.artist.visibility=View.VISIBLE
-        binding.song.visibility=View.VISIBLE
-        binding.times.visibility=View.VISIBLE
+        binding.controlPanel.addToFolder.visibility = View.VISIBLE
+        binding.controlPanel.repeat.visibility = View.VISIBLE
+        binding.controlPanel.rotate.visibility = View.VISIBLE
+        binding.controlPanel.star.visibility = View.VISIBLE
+        binding.controlPanel.playPause.visibility = View.VISIBLE
+        binding.openListFragment.visibility = View.VISIBLE
+        binding.controlPanel.addToFolder.visibility = View.VISIBLE
+        binding.seek.visibility = View.VISIBLE
+        binding.nextPrev.visibility = View.VISIBLE
+        binding.artist.visibility = View.VISIBLE
+        binding.song.visibility = View.VISIBLE
+        binding.times.visibility = View.VISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-     //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
+        binding.picture.setBackgroundResource(R.drawable.albom)
+        binding.textUsb.visibility= View.INVISIBLE
+        //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
     }
-    fun auxModeActivation(){
+
+    fun auxModeActivation() {
         changeSource(binding.controlPanel.pop)
         changeSource(binding.sourceSelection.pap)
-        binding.controlPanel.repeat.visibility=View.INVISIBLE
-        binding.controlPanel.rotate.visibility=View.INVISIBLE
-        binding.controlPanel.star.visibility=View.INVISIBLE
-        binding.controlPanel.playPause.visibility=View.INVISIBLE
-        binding.openListFragment.visibility=View.INVISIBLE
-        binding.controlPanel.addToFolder.visibility=View.INVISIBLE
-        binding.seek.visibility=View.INVISIBLE
-        binding.nextPrev.visibility=View.INVISIBLE
-        binding.artist.visibility=View.INVISIBLE
-        binding.song.visibility=View.INVISIBLE
-        binding.times.visibility=View.INVISIBLE
+        binding.controlPanel.repeat.visibility = View.INVISIBLE
+        binding.controlPanel.rotate.visibility = View.INVISIBLE
+        binding.controlPanel.star.visibility = View.INVISIBLE
+        binding.controlPanel.playPause.visibility = View.INVISIBLE
+        binding.openListFragment.visibility = View.INVISIBLE
+        binding.controlPanel.addToFolder.visibility = View.INVISIBLE
+        binding.seek.visibility = View.INVISIBLE
+        binding.nextPrev.visibility = View.INVISIBLE
+        binding.artist.visibility = View.INVISIBLE
+        binding.song.visibility = View.INVISIBLE
+        binding.times.visibility = View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binding.picture.setBackgroundResource(R.drawable.auxx)
+        binding.textUsb.visibility= View.INVISIBLE
+
     }
+
+    fun usbModeActivation() {
+        changeSource(binding.controlPanel.pop)
+        changeSource(binding.sourceSelection.pap)
+        binding.controlPanel.addToFolder.visibility = View.VISIBLE
+        binding.controlPanel.repeat.visibility = View.VISIBLE
+        binding.controlPanel.rotate.visibility = View.VISIBLE
+        binding.controlPanel.star.visibility = View.VISIBLE
+        binding.controlPanel.playPause.visibility = View.VISIBLE
+        binding.openListFragment.visibility = View.VISIBLE
+        binding.controlPanel.addToFolder.visibility = View.VISIBLE
+        binding.seek.visibility = View.VISIBLE
+        binding.nextPrev.visibility = View.VISIBLE
+        binding.artist.visibility = View.VISIBLE
+        binding.song.visibility = View.VISIBLE
+        binding.times.visibility = View.VISIBLE
+        binding.textUsb.visibility= View.VISIBLE
+        binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
+        binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binding.picture.setBackgroundResource(R.drawable.albom)
+        //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
+    }
+
+
 }
 

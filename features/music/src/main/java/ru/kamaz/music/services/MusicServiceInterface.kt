@@ -14,6 +14,7 @@ interface MusicServiceInterface{
         fun startTrack(context: Context)
         fun playOrPause(): Boolean
         fun testPlay(track: Track)
+        fun firstOpenTrackFound(track: Track)
         fun getMusicImg(albumID: Long)
         fun pause()
         fun resume()
@@ -28,6 +29,7 @@ interface MusicServiceInterface{
         fun getArtistName(): StateFlow<String>
         fun getMusicDuration(): StateFlow<String>
         fun checkDeviceConnection(): StateFlow<Boolean>
+        fun checkUSBConnection(): StateFlow<Boolean>
         fun updateWidget():StateFlow<Boolean>
     }
 

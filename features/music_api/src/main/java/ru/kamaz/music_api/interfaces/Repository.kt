@@ -9,5 +9,6 @@ interface Repository {
     fun loadData(): Either<None, List<Track>>
     fun getMusicCover(albumId: Long): Either<None, String>
     fun getMusicPositionFlow(): Flow<Int>
-    fun testGetData(): String
+    fun lastTrack(): Either<None, String>
+
 }

@@ -7,4 +7,5 @@ import ru.sir.core.None
 interface MediaManager {
     fun scanTracks(): Either<None, List<Track>>
     fun getAlbumImagePath(albumID: Long): Either<None, String>
+
 }
