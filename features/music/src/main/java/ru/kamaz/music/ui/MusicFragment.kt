@@ -46,6 +46,7 @@ class MusicFragment :
         binding.controlPanel.playPause
             .setOnClickListener {
             viewModel.playOrPause()
+
         }
         binding.controlPanel.rotate.setOnClickListener {
             viewModel.startTrack()
