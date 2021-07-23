@@ -30,7 +30,10 @@ interface MusicServiceInterface{
         fun getMusicDuration(): StateFlow<String>
         fun checkDeviceConnection(): StateFlow<Boolean>
         fun checkUSBConnection(): StateFlow<Boolean>
+        fun checkBTConnection(): StateFlow<Boolean>
         fun updateWidget():StateFlow<Boolean>
+        fun btModeOn():StateFlow<Boolean>
+
     }
 
     interface ViewModel{

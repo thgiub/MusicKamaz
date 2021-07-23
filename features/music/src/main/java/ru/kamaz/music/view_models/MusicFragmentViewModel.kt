@@ -39,6 +39,7 @@ class MusicFragmentViewModel @Inject constructor(
     val isPlaying = _isPlaying.asStateFlow()
     private val _btModeActivation = MutableStateFlow(false)
     val btModeActivation = _btModeActivation.asStateFlow()
+
     val artist: StateFlow<String> by lazy {
       service.value?.getArtistName() ?: MutableStateFlow("Unknown")
     }
@@ -51,8 +52,15 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
     }
 
+    val test: StateFlow<Boolean> by lazy {
+        service.value?.checkBTConnection() ?: MutableStateFlow(true)
+    }
     val isNotConnectedUsb: StateFlow<Boolean> by lazy {
         service.value?.checkUSBConnection() ?: MutableStateFlow(true)
+    }
+
+    val isBtModeOn: StateFlow<Boolean> by lazy {
+        service.value?.btModeOn() ?: MutableStateFlow(true)
     }
 
     private val _duration = MutableStateFlow("--:--")
@@ -193,9 +201,8 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun selectBtMode() {
-        Log.d("test", "${_btModeActivation.value}")
-        _btModeActivation.value = true
-        Log.d("test", "${_btModeActivation.value}")
+        Log.d("test", "${_btModeActivation.value} hui")
+        Log.d("test", "${_btModeActivation.value} hui")
     }
 
 

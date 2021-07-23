@@ -39,7 +39,7 @@
         android:id="@+id/disk"
         style="@style/Button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/usb2"
+        app:layout_constraintEnd_toStartOf="@id/usb"
         app:layout_constraintStart_toEndOf="@id/btn_bt"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="@dimen/marginTop"
@@ -50,7 +50,7 @@
        />
 
     <TextView
-        android:id="@+id/usb2"
+        android:id="@+id/usb"
         style="@style/Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

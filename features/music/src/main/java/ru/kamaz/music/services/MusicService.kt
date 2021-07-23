@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.appwidget.AppWidgetManager
+import android.bluetooth.BluetoothDevice
 import android.content.*
 import android.content.ContentValues.TAG
 import android.graphics.Color
@@ -51,6 +52,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     BluetoothManagerListener, MusicManagerListener {
 
     val twManager = BluetoothManager()
+    lateinit var device: BluetoothDevice
     private val twManagerMusic = MusicManager()
 
     private val _isNotConnected = MutableStateFlow(true)
@@ -123,6 +125,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _isPlaying = MutableStateFlow<Boolean>(true)
     val isPlaying = _isPlaying.asStateFlow()
 
+    private val _isBtModeOn = MutableStateFlow<Boolean>(false)
+    val isBtModeOn = _isBtModeOn.asStateFlow()
+
     private val _duration = MutableStateFlow("00:00")
     val duration = _duration.asStateFlow()
 
@@ -158,11 +163,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     fun startBtMode() {
-        myViewModel.selectBtMode()
         stopMediaPlayer()
-        this.mode = SourceEnum.BT
-        Log.i("test", "serviceBtMusic")
         startBtListener()
+       this.mode = SourceEnum.BT
+        _isBtModeOn.tryEmit(true)
+        _isBtModeOn.tryEmit(false)
     }
 
     fun startDiskMode() {
@@ -178,13 +183,13 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         twManager.stopMonitoring(applicationContext)
     }
     fun startBtListener(){
-        Log.i("test", "stopBtListener")
+        Log.i("test", "startBtListener")
         twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
             twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
-            Log.i("init", "listener_work")
         }
+
     }
 
     fun startMusicListener(){
@@ -405,9 +410,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         duration.launchOn(lifecycleScope) {
             widgettest.updateTestDuration(this, it)
         }
-        btDeviceIsConnecting.launchOn(lifecycleScope){
 
-        }
         isPlaying.launchOn(lifecycleScope){
             widgettest.updatePlayPauseImg(this, it)
         }
@@ -499,11 +502,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun sourceSelection(action: SourceEnum) {
         when (action) {
-            SourceEnum.BT ->{
-                if(isNotConnected.value){
+            SourceEnum.BT -> {
+                if (isNotConnected.value) {
                     Log.i("test", "bt off")
                     getToastConnectBtDevice(0)
-                }else{
+                } else {
                     Log.i("test", "bt on")
                     startBtMode()
                 }
@@ -514,7 +517,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    fun getToastConnectBtDevice(btDevise:Int){
+    fun getToastConnectBtDevice(btDevise: Int){
         _btDeviceIsConnecting.value = btDevise
     }
 
@@ -528,7 +531,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isNotUSBConnected
+    override fun checkBTConnection(): StateFlow<Boolean> = isNotConnected
     override fun updateWidget(): StateFlow<Boolean> =isNotConnected
+    override fun btModeOn(): StateFlow<Boolean> =isBtModeOn
 
     override fun onCompletion(mp: MediaPlayer?) {
 

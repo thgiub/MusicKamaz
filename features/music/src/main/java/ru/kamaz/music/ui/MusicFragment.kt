@@ -7,17 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.services.MusicService
-import ru.kamaz.music.ui.NavAction.OPEN_TEST_FRAGMENT
-
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
-
 import ru.kamaz.music.view_models.MusicFragmentViewModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
@@ -56,7 +52,7 @@ class MusicFragment :
             viewModel.previousTrack()
         }
         binding.openListFragment.setOnClickListener {
-            navigator.navigateTo(UiAction(OPEN_TEST_FRAGMENT))
+            navigator.navigateTo(UiAction(OPEN_TRACK_LIST_FRAGMENT))
         }
         binding.folder.setOnClickListener {
             changeSource(binding.controlPanel.pop)
@@ -65,7 +61,7 @@ class MusicFragment :
         binding.sourceSelection.btnBt.setOnClickListener {
             Log.i("Test", "musicFragment")
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-            btModeActivation()
+            //btModeActivation()
         }
         binding.sourceSelection.disk.setOnClickListener {
             viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
@@ -73,6 +69,10 @@ class MusicFragment :
         }
         binding.sourceSelection.aux.setOnClickListener {
             auxModeActivation()
+        }
+
+        binding.sourceSelection.usb.setOnClickListener {
+            usbModeActivation()
         }
 
 
@@ -139,9 +139,17 @@ class MusicFragment :
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
         }
 
-        viewModel.btModeActivation.launchWhenStarted(lifecycleScope) {
-            Log.i("fragmentTest", "$it")
-            btModeActivation()
+        viewModel.test.launchWhenStarted(lifecycleScope) {
+            if (it) {
+                btModeActivation()
+                Log.i("test", "frag ")
+            } else {
+                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+                btModeActivation()
+                Log.i("test", "frag2 ")
+
+            }
+
         }
 
         viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
@@ -155,12 +163,16 @@ class MusicFragment :
             }
         }
 
-        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope){
+        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope) {
             if (it) {
                 usbModeActivation()
             } else {
                 diskModeActivation()
             }
+        }
+
+        viewModel.isBtModeOn.launchWhenStarted(lifecycleScope){
+            if (it) btModeActivation()
         }
     }
 
@@ -195,8 +207,9 @@ class MusicFragment :
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
+        binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
         binding.picture.setBackgroundResource(R.drawable.bluetooth_back)
-        binding.textUsb.visibility= View.INVISIBLE
+        binding.textUsb.visibility = View.INVISIBLE
 
     }
 
@@ -218,8 +231,9 @@ class MusicFragment :
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
         binding.picture.setBackgroundResource(R.drawable.albom)
-        binding.textUsb.visibility= View.INVISIBLE
+        binding.textUsb.visibility = View.INVISIBLE
         //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
     }
 
@@ -240,8 +254,9 @@ class MusicFragment :
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
         binding.picture.setBackgroundResource(R.drawable.auxx)
-        binding.textUsb.visibility= View.INVISIBLE
+        binding.textUsb.visibility = View.INVISIBLE
 
     }
 
@@ -260,8 +275,9 @@ class MusicFragment :
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
-        binding.textUsb.visibility= View.VISIBLE
-        binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
+        binding.textUsb.visibility = View.VISIBLE
+        binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.picture.setBackgroundResource(R.drawable.albom)
