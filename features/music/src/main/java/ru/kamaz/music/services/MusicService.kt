@@ -11,13 +11,14 @@ import android.content.*
 import android.content.ContentValues.TAG
 import android.graphics.Color
 import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.AudioManager.OnAudioFocusChangeListener
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
@@ -27,7 +28,6 @@ import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
 import ru.biozzlab.twmanager.managers.MusicManager
-
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.TestWidget
@@ -38,6 +38,8 @@ import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
 import ru.kamaz.music_api.interactor.GetMusicCover
 import ru.kamaz.music_api.interactor.GetMusicPosition
+import ru.kamaz.music_api.interactor.InsertFavoriteMusic
+import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.Track
 import ru.kamaz.widget.ui.MusicWidget
 import ru.sir.core.Either
@@ -47,21 +49,25 @@ import ru.sir.presentation.extensions.launchOn
 import javax.inject.Inject
 
 
-
 class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
-    BluetoothManagerListener, MusicManagerListener {
+     MusicManagerListener, BluetoothManagerListener {
 
     val twManager = BluetoothManager()
     lateinit var device: BluetoothDevice
-    private val twManagerMusic = MusicManager()
+   // private val twManagerMusic = MusicManager()
 
     private val _isNotConnected = MutableStateFlow(true)
     val isNotConnected = _isNotConnected.asStateFlow()
-    private val _isNotUSBConnected = MutableStateFlow(true)
+    private val _isNotUSBConnected = MutableStateFlow(false)
     val isNotUSBConnected = _isNotUSBConnected.asStateFlow()
 
     private var lifecycleJob = Job()
     private lateinit var lifecycleScope: CoroutineScope
+
+    private var audioManager: AudioManager? = null
+
+
+//    var mAudioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
 
     @Inject
@@ -76,6 +82,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     @Inject
     lateinit var getMusicPosition: GetMusicPosition
 
+    @Inject
+    lateinit var insertFavoriteMusic: InsertFavoriteMusic
+
     private val widget = MusicWidget.instance
     private val widgettest = TestWidget.instance
 
@@ -84,7 +93,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     override fun onSdStatusChanged(path: String, isAdded: Boolean) {
-        _isNotUSBConnected.value = !isAdded
+      //  _isNotUSBConnected.value = !isAdded
     }
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
@@ -107,9 +116,19 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         fun getService(): MusicServiceInterface.Service = this@MusicService
     }
 
+    private fun getAudioManager(): AudioManager {
+        if (audioManager == null) {
+            audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        }
+        return audioManager as AudioManager
+    }
+
+
+
     private var currentTrackPosition = 0
     private var tracks = ArrayList<Track>()
     private val binder = MyBinder()
+    private var likeTrack = ArrayList<FavoriteSongs>()
 
     private var mode = SourceEnum.DISK
 
@@ -128,16 +147,21 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _isBtModeOn = MutableStateFlow<Boolean>(false)
     val isBtModeOn = _isBtModeOn.asStateFlow()
 
+    private val _isDiskModeOn = MutableStateFlow<Boolean>(false)
+    val isDiskModeOn = _isDiskModeOn.asStateFlow()
+
     private val _duration = MutableStateFlow("00:00")
     val duration = _duration.asStateFlow()
 
+    private val _idSong = MutableStateFlow(1)
+    val idSong = _idSong.asStateFlow()
     private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
     val tickFlow: MutableSharedFlow<Unit> = _tickFlow
 
     private val _maxSeek = MutableStateFlow(0)
     val maxSeek = _maxSeek.asStateFlow()
 
-    private val _btDeviceIsConnecting = MutableStateFlow(1)
+    private val _btDeviceIsConnecting = MutableStateFlow<Boolean>(false)
     val btDeviceIsConnecting = _btDeviceIsConnecting.asStateFlow()
 
     override fun onBind(intent: Intent?): IBinder = binder
@@ -153,51 +177,75 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     enum class SourceEnum(val value: Int) {
         BT(0),
         AUX(1),
-        DISK(2)
+        DISK(2),
+        USB(3)
     }
 
     override fun onBluetoothMusicDataChanged(name: String, artist: String) {
+
+        Log.i("name", "name $name")
+        Log.i("name", "name $artist")
         _title.value = name
         _artist.value = artist
         _isPlaying.value = mediaPlayer.isPlaying
     }
 
     fun startBtMode() {
+        //
         stopMediaPlayer()
         startBtListener()
-       this.mode = SourceEnum.BT
+       // getAudioManager().abandonAudioFocus(audioFocusListener)
+        this.mode = SourceEnum.BT
         _isBtModeOn.tryEmit(true)
         _isBtModeOn.tryEmit(false)
     }
 
-    fun startDiskMode() {
+    fun startDiskMode(btOn: Boolean) {
+        if (btOn) stopBtListener()
         this.mode = SourceEnum.DISK
-        //stopBtListener()
+        _isDiskModeOn.tryEmit(true)
+        _isDiskModeOn.tryEmit(false)
+    }
+
+    fun startUsbMode(usbOn: Boolean) {
+        if (usbOn) stopBtListener()
+        this.mode = SourceEnum.DISK
+        _isDiskModeOn.tryEmit(true)
+        _isDiskModeOn.tryEmit(false)
     }
 
 
     fun stopBtListener() {
         Log.i("test", "stopBtListener")
-       // twManager.playerPlayPause()
-        twManager.removeListener(this)
-        twManager.stopMonitoring(applicationContext)
-    }
-    fun startBtListener(){
-        Log.i("test", "startBtListener")
-        twManager.startMonitoring(applicationContext) {
-            twManager.addListener(this)
-            twManagerMusic.addListener(this)
-            twManager.requestConnectionInfo()
+        try {
+            twManager.playerPlayPause()
+            twManager.removeListener(this)
+            twManager.stopMonitoring(applicationContext)
+
+        }catch (e: Exception){
+
         }
 
     }
 
-    fun startMusicListener(){
-        twManagerMusic.addListener(this)
+    fun startBtListener() {
+
+        twManager.startMonitoring(applicationContext) {
+            twManager.addListener(this)
+          //  twManagerMusic.addListener(this)
+            twManager.requestConnectionInfo()
+
+        }
     }
-    fun stopMusicListener(){
-        twManagerMusic.removeListener(this)
+
+    fun startMusicListener() {
+      // twManagerMusic.addListener(this)
     }
+
+    fun stopMusicListener() {
+     //  twManagerMusic.removeListener(this)
+    }
+
     override fun startTrack(context: Context) {
 
         updateTracks(mediaManager)
@@ -209,6 +257,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             id
         )
         getMusicImg(albumID)
+
         mediaPlayer.apply {
             stop()
             setDataSource(context, myUri)
@@ -222,23 +271,39 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun testPlay(track: Track) {
+       // if (audioFocus()){
+            updateTracks(mediaManager)
+            val currentTrack = track
+            val albumID: Long = currentTrack.albumId
+            _idSong.value= currentTrack.id.toInt()
+            updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
 
-        updateTracks(mediaManager)
-        val currentTrack = track
-        val albumID: Long = currentTrack.albumId
+            getMusicImg(albumID)
+            mediaPlayer.apply {
+                stop()
+                reset()
+                setDataSource(track.data)
+                prepare()
+                start()
+            }
+            updateSeekBar()
+       // }
 
-        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
-
-        getMusicImg(albumID)
-        mediaPlayer.apply {
-            stop()
-            reset()
-            setDataSource(track.data)
-            prepare()
-            start()
-        }
-        updateSeekBar()
     }
+
+
+    private fun audioFocus(): Boolean {
+        return (getAudioManager()
+            .requestAudioFocus(
+                audioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN
+            )
+                == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+    }
+
+    private val audioFocusListener =
+        OnAudioFocusChangeListener { focusChange ->
+
+        }
 
     override fun firstOpenTrackFound(track: Track) {
         Log.i("222", "$track ")
@@ -258,20 +323,21 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             }
             SourceEnum.BT -> {
+
                 twManager.playerPlayPause()
 
                 Log.i("PoP", "play or pause")
             }
             SourceEnum.AUX -> TODO()
         }
-        return    isPlaying()
+        return isPlaying()
     }
 
     private fun updateMusicName(title: String, artist: String, duration: String) {
         _title.value = title
         _artist.value = artist
-        _duration.value=duration
-        _isPlaying.value= mediaPlayer.isPlaying
+        _duration.value = duration
+        _isPlaying.value = mediaPlayer.isPlaying
     }
 
     override fun getMusicImg(albumID: Long) {
@@ -292,12 +358,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun pause() {
         mediaPlayer.pause()
-        _isPlaying.value= mediaPlayer.isPlaying
+        _isPlaying.value = mediaPlayer.isPlaying
     }
 
     override fun resume() {
         mediaPlayer.start()
-        _isPlaying.value= mediaPlayer.isPlaying
+        _isPlaying.value = mediaPlayer.isPlaying
     }
 
     override fun isPlaying(): Boolean = mediaPlayer.isPlaying
@@ -332,6 +398,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 twManager.playerPrev()
             }
             SourceEnum.AUX -> TODO()
+            SourceEnum.USB -> TODO()
         }
 
     }
@@ -366,9 +433,13 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
             SourceEnum.BT -> {
                 twManager.playerNext()
-                //updateMusicName(name,artist,duration)
+                // updateMusicName(title.value,artist.value,duration.value)
             }
             SourceEnum.AUX -> {
+
+            }
+
+            SourceEnum.USB -> {
 
             }
         }
@@ -392,7 +463,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         updateTracks(mediaManager)
         initMediaPlayer()
         startForeground()
-        startMusicListener()
+       startMusicListener()
         initLifecycleScope()
         Log.i("init", "listener_work")
         twManager.startMonitoring(applicationContext) {
@@ -411,7 +482,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             widgettest.updateTestDuration(this, it)
         }
 
-        isPlaying.launchOn(lifecycleScope){
+        isPlaying.launchOn(lifecycleScope) {
             widgettest.updatePlayPauseImg(this, it)
         }
 
@@ -419,7 +490,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private fun initLifecycleScope() {
         unsubscribeLifecycleScope()
-
         lifecycleJob = Job()
         lifecycleScope = CoroutineScope(Dispatchers.Main + lifecycleJob)
     }
@@ -447,7 +517,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 ACTION_PREV -> previousTrack()
             }
         }
-
         return START_STICKY //super.onStartCommand(intent, flags, startId)
     }
 
@@ -505,20 +574,31 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             SourceEnum.BT -> {
                 if (isNotConnected.value) {
                     Log.i("test", "bt off")
-                    getToastConnectBtDevice(0)
+                    getToastConnectBtDevice(true)
                 } else {
                     Log.i("test", "bt on")
                     startBtMode()
                 }
 
             }
-            SourceEnum.DISK -> startDiskMode()
-            SourceEnum.AUX -> TODO()
+            SourceEnum.DISK ->
+                if (isNotConnected.value) {
+                    startDiskMode(false)
+                } else {
+                    startDiskMode(true)
+                }
+            SourceEnum.USB ->
+                if (isNotUSBConnected.value) {
+                    startUsbMode(true)
+                } else {
+                    startUsbMode(false)
+                }
         }
     }
 
-    fun getToastConnectBtDevice(btDevise: Int){
+    fun getToastConnectBtDevice(btDevise: Boolean) {
         _btDeviceIsConnecting.value = btDevise
+        _btDeviceIsConnecting.value = !btDevise
     }
 
     override fun getMusicName(): StateFlow<String> = title
@@ -528,12 +608,19 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun getMusicDuration(): StateFlow<String> = duration
 
 
-
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isNotUSBConnected
     override fun checkBTConnection(): StateFlow<Boolean> = isNotConnected
-    override fun updateWidget(): StateFlow<Boolean> =isNotConnected
-    override fun btModeOn(): StateFlow<Boolean> =isBtModeOn
+    override fun updateWidget(): StateFlow<Boolean> = isNotConnected
+    override fun btModeOn(): StateFlow<Boolean> = isBtModeOn
+    override fun diskModeOn(): StateFlow<Boolean> = _isDiskModeOn
+    override fun usbModeOn(): StateFlow<Boolean>  = isNotUSBConnected
+
+    override fun dialogFragment(): StateFlow<Boolean> = btDeviceIsConnecting
+    override fun insertFavoriteMusic() {
+        val music = FavoriteSongs(idSong.value,title.value)
+       insertFavoriteMusic(InsertFavoriteMusic.Params(music))
+    }
 
     override fun onCompletion(mp: MediaPlayer?) {
 
@@ -542,6 +629,26 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         "BT Player state = $isPlaying".easyLog(this)
+    }
+
+
+
+    private val afChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_LOSS -> {
+
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                // Pause playback
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                // Lower the volume, keep playing
+            }
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                // Your app has been granted audio focus again
+                // Raise volume to normal, restart playback if necessary
+            }
+        }
     }
 
 }

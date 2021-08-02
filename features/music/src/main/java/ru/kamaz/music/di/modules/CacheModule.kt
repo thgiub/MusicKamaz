@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import ru.kamaz.music.cache.MusicCacheImpl
 import ru.kamaz.music.cache.SharedPrefsManager
+import ru.kamaz.music.cache.db.AppDatabase
 import ru.kamaz.music.data.MusicCache
 import ru.sir.presentation.base.BaseApplication
 import javax.inject.Singleton
@@ -22,6 +23,10 @@ class CacheModule(private val context: Context) {
 
     @Provides
     @Singleton
+    fun provideRoomManager():AppDatabase = AppDatabase.getDatabase(context)
+
+    @Provides
+    @Singleton
     fun provideSharedPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
     }
@@ -29,7 +34,7 @@ class CacheModule(private val context: Context) {
 
     @Provides
     @Singleton
-    fun provideCache(prefsManager: SharedPrefsManager): MusicCache {
-        return MusicCacheImpl(prefsManager)
+    fun provideCache(prefsManager: SharedPrefsManager, db : AppDatabase): MusicCache {
+        return MusicCacheImpl(prefsManager, db)
     }
 }

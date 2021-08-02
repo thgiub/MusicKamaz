@@ -1,5 +1,5 @@
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/pop"
+    android:id="@+id/viewPlayPause"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -37,13 +37,13 @@
         style="@style/controlButton"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/star"
+        app:layout_constraintEnd_toStartOf="@id/like"
         app:layout_constraintStart_toEndOf="@id/play_pause"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_plus_music" />
 
     <ImageView
-        android:id="@+id/star"
+        android:id="@+id/like"
         style="@style/controlButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

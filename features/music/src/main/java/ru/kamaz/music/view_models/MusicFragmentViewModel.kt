@@ -19,6 +19,7 @@ import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.GetMusicPosition
+import ru.kamaz.music_api.interactor.InsertFavoriteMusic
 import ru.kamaz.music_api.interfaces.Repository
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
@@ -56,11 +57,21 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.checkBTConnection() ?: MutableStateFlow(true)
     }
     val isNotConnectedUsb: StateFlow<Boolean> by lazy {
-        service.value?.checkUSBConnection() ?: MutableStateFlow(true)
+        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
     }
 
     val isBtModeOn: StateFlow<Boolean> by lazy {
         service.value?.btModeOn() ?: MutableStateFlow(true)
+    }
+    val isDiskModeOn: StateFlow<Boolean> by lazy {
+        service.value?.diskModeOn() ?: MutableStateFlow(true)
+    }
+    val isUsbModeOn: StateFlow<Boolean> by lazy {
+        service.value?.usbModeOn() ?: MutableStateFlow(true)
+    }
+
+    val    isDeviceNotConnectFromBt: StateFlow<Boolean> by lazy {
+        service.value?.dialogFragment()?: MutableStateFlow(false)
     }
 
     private val _duration = MutableStateFlow("--:--")
@@ -131,6 +142,10 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.previousTrack()
     }
 
+    fun isSaveFavoriteMusic(){
+        service.value?.insertFavoriteMusic()
+    }
+
     fun nextTrack() {
         service.value?.nextTrack()
     }
@@ -152,7 +167,9 @@ class MusicFragmentViewModel @Inject constructor(
             MusicService.SourceEnum.DISK -> {
                 service.value?.sourceSelection(action)
             }
-
+            MusicService.SourceEnum.USB -> {
+                service.value?.sourceSelection(action)
+            }
         }
 
     }

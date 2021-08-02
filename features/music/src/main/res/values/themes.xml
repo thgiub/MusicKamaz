@@ -14,6 +14,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="Toolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
     <style name="SeekBar" parent="Theme.AppCompat.Light">
         <item name="android:colorControlActivated">#93EBFF</item>
         <item name="android:colorControlNormal">#00B0FF</item>

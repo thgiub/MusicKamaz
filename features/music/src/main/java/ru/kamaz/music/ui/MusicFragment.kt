@@ -1,7 +1,12 @@
 package ru.kamaz.music.ui
 
+import android.app.AlertDialog
+import android.content.ComponentName
+import android.content.DialogInterface
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +26,7 @@ import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
 import java.io.File
+
 
 class MusicFragment :
     BaseFragment<MusicFragmentViewModel, FragmentPlayerBinding>(MusicFragmentViewModel::class.java) {
@@ -55,8 +61,7 @@ class MusicFragment :
             navigator.navigateTo(UiAction(OPEN_TRACK_LIST_FRAGMENT))
         }
         binding.folder.setOnClickListener {
-            changeSource(binding.controlPanel.pop)
-            changeSource(binding.sourceSelection.pap)
+            changeSourceViewButtons()
         }
         binding.sourceSelection.btnBt.setOnClickListener {
             Log.i("Test", "musicFragment")
@@ -65,14 +70,18 @@ class MusicFragment :
         }
         binding.sourceSelection.disk.setOnClickListener {
             viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
-            diskModeActivation()
+          //  diskModeActivation()
         }
         binding.sourceSelection.aux.setOnClickListener {
             auxModeActivation()
         }
 
         binding.sourceSelection.usb.setOnClickListener {
+            viewModel.vmSourceSelection(MusicService.SourceEnum.USB)
             usbModeActivation()
+        }
+        binding.controlPanel.like.setOnClickListener {
+            viewModel.isSaveFavoriteMusic()
         }
 
 
@@ -90,6 +99,11 @@ class MusicFragment :
             }
         })
         super.setListeners()
+    }
+
+    fun changeSourceViewButtons(){
+        changeSource(binding.controlPanel.viewPlayPause)
+        changeSource(binding.sourceSelection.viewChangeSource)
     }
 
     fun changeSource(view: View) {
@@ -174,6 +188,16 @@ class MusicFragment :
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope){
             if (it) btModeActivation()
         }
+        viewModel.isDiskModeOn.launchWhenStarted(lifecycleScope){
+            if (it) diskModeActivation()
+        }
+        viewModel.isUsbModeOn.launchWhenStarted(lifecycleScope){
+            if (it) diskModeActivation()
+        }
+
+        viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope){
+            if (it) dialog()
+        }
     }
 
     private fun updateTrackCover(coverPath: String) {
@@ -190,12 +214,37 @@ class MusicFragment :
         }
     }
 
+    fun dialog(){
+        AlertDialog.Builder(context)
+            .setTitle("Нет подключения по Bt")
+            .setMessage("Перейдти в настройки для подключения устройства по BT")
+            .setPositiveButton(android.R.string.yes,
+                DialogInterface.OnClickListener { dialog, which ->
+                    openBluetoothSettings()
+                })
+            .setNegativeButton(android.R.string.no, null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show()
+    }
+
+    private fun openBluetoothSettings() {
+        val intent = Intent(Intent.ACTION_MAIN, null)
+        val componentName = ComponentName("ru.sir.settings", "ru.sir.settings.ui.MainActivity")
+
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.component = componentName
+        intent.putExtra("BluetoothSettings", true)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+
+        startActivity(intent)
+    }
+
     fun btModeActivation() {
-        changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.pap)
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         binding.controlPanel.repeat.visibility = View.INVISIBLE
         binding.controlPanel.rotate.visibility = View.INVISIBLE
-        binding.controlPanel.star.visibility = View.INVISIBLE
+        binding.controlPanel.like.visibility = View.INVISIBLE
         binding.controlPanel.addToFolder.visibility = View.INVISIBLE
         binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.openListFragment.visibility = View.INVISIBLE
@@ -214,12 +263,14 @@ class MusicFragment :
     }
 
     fun diskModeActivation() {
-        changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.pap)
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+/*        changeSource(binding.controlPanel.pop)
+        changeSource(binding.sourceSelection.viewChangeSource)*/
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
         binding.controlPanel.repeat.visibility = View.VISIBLE
         binding.controlPanel.rotate.visibility = View.VISIBLE
-        binding.controlPanel.star.visibility = View.VISIBLE
+        binding.controlPanel.like.visibility = View.VISIBLE
         binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.openListFragment.visibility = View.VISIBLE
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
@@ -238,11 +289,13 @@ class MusicFragment :
     }
 
     fun auxModeActivation() {
-        changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.pap)
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+       /* changeSource(binding.controlPanel.pop)
+        changeSource(binding.sourceSelection.viewChangeSource)*/
         binding.controlPanel.repeat.visibility = View.INVISIBLE
         binding.controlPanel.rotate.visibility = View.INVISIBLE
-        binding.controlPanel.star.visibility = View.INVISIBLE
+        binding.controlPanel.like.visibility = View.INVISIBLE
         binding.controlPanel.playPause.visibility = View.INVISIBLE
         binding.openListFragment.visibility = View.INVISIBLE
         binding.controlPanel.addToFolder.visibility = View.INVISIBLE
@@ -261,12 +314,14 @@ class MusicFragment :
     }
 
     fun usbModeActivation() {
-        changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.pap)
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+      /*  changeSource(binding.controlPanel.pop)
+        changeSource(binding.sourceSelection.viewChangeSource)*/
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
         binding.controlPanel.repeat.visibility = View.VISIBLE
         binding.controlPanel.rotate.visibility = View.VISIBLE
-        binding.controlPanel.star.visibility = View.VISIBLE
+        binding.controlPanel.like.visibility = View.VISIBLE
         binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.openListFragment.visibility = View.VISIBLE
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
@@ -281,6 +336,7 @@ class MusicFragment :
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.picture.setBackgroundResource(R.drawable.albom)
+        binding.sourceSelection
         //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
     }
 
