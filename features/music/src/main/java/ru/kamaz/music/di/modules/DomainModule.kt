@@ -2,10 +2,7 @@ package ru.kamaz.music.di.modules
 
 import dagger.Module
 import dagger.Provides
-import ru.kamaz.music_api.interactor.GetMusicCover
-import ru.kamaz.music_api.interactor.GetMusicPosition
-import ru.kamaz.music_api.interactor.InsertFavoriteMusic
-import ru.kamaz.music_api.interactor.LoadData
+import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.interfaces.Repository
 
 @Module
@@ -22,4 +19,8 @@ class DomainModule {
 
     @Provides
     fun provideInsertFavoriteMusic(repository: Repository): InsertFavoriteMusic = InsertFavoriteMusic(repository)
+    @Provides
+    fun provideInsertLastMusic(repository: Repository): InsertLastMusic = InsertLastMusic(repository)
+    @Provides
+    fun provideQueryLastMusic(repository: Repository): QueryLastMusic = QueryLastMusic(repository)
 }

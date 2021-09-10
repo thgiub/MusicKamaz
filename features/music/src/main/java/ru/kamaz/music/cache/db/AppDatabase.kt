@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import ru.kamaz.music.cache.db.dao.  HistoryDao
 import ru.kamaz.music.cache.db.dao.LikeMusicDao
 import ru.kamaz.music.domain.FavoriteSongsEntity
+import ru.kamaz.music.domain.HistorySongsEntity
 
-@Database(entities = arrayOf(FavoriteSongsEntity::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(FavoriteSongsEntity::class, HistorySongsEntity::class), version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): LikeMusicDao
-
+    abstract fun historySongsDao(): HistoryDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -21,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
             synchronized(this) {
 
                 INSTANCE = Room
-                    .databaseBuilder(context, AppDatabase::class.java, "WAREHOUSE_DATABASE")
+                    .databaseBuilder(context, AppDatabase::class.java, "MUSIC_DATABASE")
                     .fallbackToDestructiveMigration()
                     .build()
 

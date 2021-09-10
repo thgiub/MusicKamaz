@@ -12,9 +12,10 @@ interface LikeMusicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(users: FavoriteSongsEntity)
 
-    @Query("SELECT * FROM users_warehouse")
+    @Query("SELECT * FROM like_songs")
     fun loadAll(): List<FavoriteSongsEntity>
 
-    @Query("SELECT * FROM users_warehouse WHERE id_song LIKE :name")
-    fun getWarehouseId(name: String): FavoriteSongsEntity
+    @Query("SELECT * FROM like_songs WHERE id_song LIKE :name")
+    fun getId(name: String): FavoriteSongsEntity
+
 }

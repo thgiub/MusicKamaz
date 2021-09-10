@@ -53,7 +53,6 @@ class AppMediaManager  @Inject constructor( val context: Context)
                     )
                 )
             }
-
             cursor.close()
         }
 

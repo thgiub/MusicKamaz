@@ -49,6 +49,11 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.getMusicName() ?: MutableStateFlow("Unknown")
     }
 
+    val duration: StateFlow<String> by lazy {
+        service.value?.getMusicDuration() ?: MutableStateFlow("--:--")
+    }
+
+
     val isNotConnected: StateFlow<Boolean> by lazy {
         service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
     }
@@ -56,6 +61,7 @@ class MusicFragmentViewModel @Inject constructor(
     val test: StateFlow<Boolean> by lazy {
         service.value?.checkBTConnection() ?: MutableStateFlow(true)
     }
+
     val isNotConnectedUsb: StateFlow<Boolean> by lazy {
         service.value?.checkUSBConnection() ?: MutableStateFlow(false)
     }
@@ -63,9 +69,11 @@ class MusicFragmentViewModel @Inject constructor(
     val isBtModeOn: StateFlow<Boolean> by lazy {
         service.value?.btModeOn() ?: MutableStateFlow(true)
     }
+
     val isDiskModeOn: StateFlow<Boolean> by lazy {
         service.value?.diskModeOn() ?: MutableStateFlow(true)
     }
+
     val isUsbModeOn: StateFlow<Boolean> by lazy {
         service.value?.usbModeOn() ?: MutableStateFlow(true)
     }
@@ -74,8 +82,8 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.dialogFragment()?: MutableStateFlow(false)
     }
 
-    private val _duration = MutableStateFlow("--:--")
-    val duration = _duration.asStateFlow()
+    /*private val _duration = MutableStateFlow("--:--")
+    val duration = _duration.asStateFlow()*/
 
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
@@ -94,41 +102,37 @@ class MusicFragmentViewModel @Inject constructor(
     val maxSeek = _maxSeek.asStateFlow()
 
     override fun onDestroy() {
-        mediaPlayer.release()
+      // mediaPlayer.release()
         super.onDestroy()
     }
 
     override fun init() {
-        val audioAttributes: AudioAttributes = AudioAttributes.Builder()
+     /*   val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
         mediaPlayer.setOnCompletionListener(this)
-        mediaPlayer.setAudioAttributes(audioAttributes)
+        mediaPlayer.setAudioAttributes(audioAttributes)*/
 
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
 
     override fun onCreate() {
-        updateTracks(mediaManager)
+      updateTracks(mediaManager)
         super.onCreate()
     }
 
     fun startTrack() {
         if (tracks.isEmpty()) {
+            Log.d("mediaPlayer", "no")
             musicEmpty()
         } else
             service.value?.testPlay(tracks[currentTrackPosition])
-    }
-
-    fun firstOpenTrackFound(){
-        if (tracks.isEmpty()) {
-            musicEmpty()
-        } else
-            Log.i("222", "$tracks[currentTrackPosition] ")
+        Log.d("mediaPlayer", "no")
 
     }
+
     fun playOrPause() {
         _isPlaying.value = service.value?.playOrPause() ?: false
     }
@@ -144,6 +148,10 @@ class MusicFragmentViewModel @Inject constructor(
 
     fun isSaveFavoriteMusic(){
         service.value?.insertFavoriteMusic()
+    }
+
+    fun isSaveLastMusic(){
+        service.value?.insertLastMusic()
     }
 
     fun nextTrack() {
@@ -183,9 +191,9 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Log.d("serWStart", "onServiceConnected: TRACK-VM")
-        _service.value = (service as MusicService.MyBinder).getService()
-        this.service.value?.setViewModel(this)
+        Log.d("testPlayTrack", "onServiceConnected")
+            _service.value = (service as MusicService.MyBinder).getService()
+            this.service.value?.setViewModel(this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {

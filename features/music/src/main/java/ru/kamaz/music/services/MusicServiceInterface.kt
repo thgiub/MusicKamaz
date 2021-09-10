@@ -11,7 +11,7 @@ interface MusicServiceInterface{
     interface Service{
         fun setViewModel(viewModel:ViewModel)
         fun init()
-        fun startTrack(context: Context)
+       //fun startTrack(context: Context)
         fun playOrPause(): Boolean
         fun testPlay(track: Track)
         fun firstOpenTrackFound(track: Track)
@@ -36,7 +36,9 @@ interface MusicServiceInterface{
         fun diskModeOn():StateFlow<Boolean>
         fun usbModeOn():StateFlow<Boolean>
         fun dialogFragment():StateFlow<Boolean>
+        fun musicEmpty():StateFlow<Boolean>
         fun insertFavoriteMusic()
+        fun insertLastMusic()
 
     }
 

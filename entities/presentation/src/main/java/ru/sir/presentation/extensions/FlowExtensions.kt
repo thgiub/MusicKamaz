@@ -1,4 +1,4 @@
-package ru.sir.presentation.extensions
+ package ru.sir.presentation.extensions
 
 import androidx.lifecycle.LifecycleCoroutineScope
 import kotlinx.coroutines.CoroutineScope

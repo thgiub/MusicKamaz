@@ -75,14 +75,6 @@ class TestWidget : BaseAppWidget() {
         appWidgetView.setTextViewText(ru.kamaz.widget.R.id.duration_widget, title)
 
         pushUpdate(context, null, appWidgetView)
-       /* var time = 0
-        while (time<title.toInt()){
-            time += 1
-        }
-
-        appWidgetView.setProgressBar(R.id.progressBar,title.toInt(),time,true)
-
-        pushUpdate(context,null,appWidgetView)*/
     }
 
 
@@ -94,7 +86,7 @@ class TestWidget : BaseAppWidget() {
             appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_pause_music)
         }else{
             "ic_pause".easyLog(this)
-            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_play)
+            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_play2)
         }
         pushUpdate(context, null, appWidgetView)
     }

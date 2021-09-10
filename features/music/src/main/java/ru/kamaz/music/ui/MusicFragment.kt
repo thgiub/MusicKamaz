@@ -35,12 +35,22 @@ class MusicFragment :
         app.getComponent<MusicComponent>().inject(this)
     }
 
+    override fun onDestroy() {
+        viewModel.isSaveLastMusic()
+        super.onDestroy()
+    }
+
     override fun initBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) =
         FragmentPlayerBinding.inflate(inflater, container, false)
+
+    override fun onResume() {
+        viewModel.startTrack()
+        super.onResume()
+    }
 
     override fun setListeners() {
         binding.next.setOnClickListener {
@@ -66,11 +76,9 @@ class MusicFragment :
         binding.sourceSelection.btnBt.setOnClickListener {
             Log.i("Test", "musicFragment")
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-            //btModeActivation()
         }
         binding.sourceSelection.disk.setOnClickListener {
             viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
-          //  diskModeActivation()
         }
         binding.sourceSelection.aux.setOnClickListener {
             auxModeActivation()
@@ -119,8 +127,6 @@ class MusicFragment :
             if (it == null) return@launchWhenStarted
             initServiceVars()
         }
-
-        viewModel.firstOpenTrackFound()
     }
 
     private fun initServiceVars() {
@@ -265,8 +271,6 @@ class MusicFragment :
     fun diskModeActivation() {
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
-/*        changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.viewChangeSource)*/
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
         binding.controlPanel.repeat.visibility = View.VISIBLE
         binding.controlPanel.rotate.visibility = View.VISIBLE

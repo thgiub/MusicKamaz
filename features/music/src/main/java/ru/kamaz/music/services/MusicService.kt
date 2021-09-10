@@ -14,7 +14,6 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.AudioManager.OnAudioFocusChangeListener
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
@@ -27,7 +26,8 @@ import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
-import ru.biozzlab.twmanager.managers.MusicManager
+import ru.kamaz.music.cache.db.dao.KamazPlayer
+import ru.kamaz.music.cache.db.dao.Playback
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.TestWidget
@@ -36,13 +36,13 @@ import ru.kamaz.music_api.BaseConstants.ACTION_PREV
 import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
-import ru.kamaz.music_api.interactor.GetMusicCover
-import ru.kamaz.music_api.interactor.GetMusicPosition
-import ru.kamaz.music_api.interactor.InsertFavoriteMusic
+import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.models.FavoriteSongs
+import ru.kamaz.music_api.models.HistorySongs
 import ru.kamaz.music_api.models.Track
 import ru.kamaz.widget.ui.MusicWidget
 import ru.sir.core.Either
+import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.easyLog
 import ru.sir.presentation.extensions.launchOn
@@ -50,11 +50,11 @@ import javax.inject.Inject
 
 
 class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
-     MusicManagerListener, BluetoothManagerListener {
+    MusicManagerListener, BluetoothManagerListener, Playback.PlaybackCallbacks {
 
     val twManager = BluetoothManager()
     lateinit var device: BluetoothDevice
-   // private val twManagerMusic = MusicManager()
+
 
     private val _isNotConnected = MutableStateFlow(true)
     val isNotConnected = _isNotConnected.asStateFlow()
@@ -67,8 +67,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private var audioManager: AudioManager? = null
 
 
-//    var mAudioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-
+    val context: Context? = null
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -85,6 +84,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     @Inject
     lateinit var insertFavoriteMusic: InsertFavoriteMusic
 
+    @Inject
+    lateinit var insertLastMusic: InsertLastMusic
+
+    @Inject
+    lateinit var queryLastMusic: QueryLastMusic
+
     private val widget = MusicWidget.instance
     private val widgettest = TestWidget.instance
 
@@ -93,12 +98,37 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     override fun onSdStatusChanged(path: String, isAdded: Boolean) {
-      //  _isNotUSBConnected.value = !isAdded
     }
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         _isNotUSBConnected.value = isAdded
 
+    }
+
+    fun updateTrack(mediaManager: MediaManager) {
+        val result = mediaManager.scanTracks()
+        if (result is Either.Right) {
+            tracks.addAll(result.r)
+        }
+    }
+
+    fun queryLastMusic() {
+        Log.i("queryLastMusic", "funWork")
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.i("queryLastMusic", "duration${this}")
+            val it = queryLastMusic.run(None())
+
+            it.either({
+                Log.i("queryLastMusic", "Failure${it}")
+            }, {
+                Log.i("queryLastMusic", "duration${it}")
+                (if (it.isEmpty()) initTrack(
+                    tracks[currentTrackPosition],
+                    data.value
+                )  else checkCurrentPosition(it))
+
+            })
+        }
     }
 
     override fun onDeviceConnected() {
@@ -124,7 +154,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
 
-
     private var currentTrackPosition = 0
     private var tracks = ArrayList<Track>()
     private val binder = MyBinder()
@@ -140,6 +169,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private val _artist = MutableStateFlow("Unknown")
     val artist = _artist.asStateFlow()
+
+    private val _data = MutableStateFlow("")
+    val data = _data.asStateFlow()
 
     private val _isPlaying = MutableStateFlow<Boolean>(true)
     val isPlaying = _isPlaying.asStateFlow()
@@ -163,15 +195,25 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private val _btDeviceIsConnecting = MutableStateFlow<Boolean>(false)
     val btDeviceIsConnecting = _btDeviceIsConnecting.asStateFlow()
+    private val _musicEmpty = MutableStateFlow<Boolean>(false)
+    val musicEmpty = _musicEmpty.asStateFlow()
 
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun setViewModel(viewModel: MusicServiceInterface.ViewModel) {
+        Log.i("testPlayTrack", "testPlay init ")
         this.myViewModel = viewModel
     }
 
+    /**/
     override fun init() {
-
+        val audioAttributes: AudioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+        mediaPlayer.setOnCompletionListener(this)
+        mediaPlayer.setAudioAttributes(audioAttributes)
+        Log.i("testPlayTrack", "testPlay init ")
     }
 
     enum class SourceEnum(val value: Int) {
@@ -190,11 +232,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _isPlaying.value = mediaPlayer.isPlaying
     }
 
+
     fun startBtMode() {
-        //
         stopMediaPlayer()
         startBtListener()
-       // getAudioManager().abandonAudioFocus(audioFocusListener)
         this.mode = SourceEnum.BT
         _isBtModeOn.tryEmit(true)
         _isBtModeOn.tryEmit(false)
@@ -222,7 +263,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             twManager.removeListener(this)
             twManager.stopMonitoring(applicationContext)
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
 
         }
 
@@ -232,36 +273,33 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
-          //  twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
 
         }
     }
 
     fun startMusicListener() {
-      // twManagerMusic.addListener(this)
+        // twManagerMusic.addListener(this)
     }
 
     fun stopMusicListener() {
-     //  twManagerMusic.removeListener(this)
+        //  twManagerMusic.removeListener(this)
     }
 
-    override fun startTrack(context: Context) {
-
+    fun initTrack(track: Track, data1: String) {
+        Log.i("testPlayTrack", "$track$data1 ")
+        val currentTrack = track
         updateTracks(mediaManager)
-        val currentTrack = tracks[currentTrackPosition]
-        val id: Long = currentTrack.id
         val albumID: Long = currentTrack.albumId
-        val myUri: Uri = ContentUris.withAppendedId(
-            android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            id
-        )
+        _idSong.value = currentTrack.id.toInt()
+        Log.i("testPlayTrack", "${_idSong.value} ")
+        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
+        _data.value = track.data
         getMusicImg(albumID)
-
         mediaPlayer.apply {
             stop()
-            setDataSource(context, myUri)
             reset()
+            setDataSource(if (data1.isEmpty()) track.data else data1)
             prepare()
         }
     }
@@ -271,24 +309,40 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun testPlay(track: Track) {
-       // if (audioFocus()){
-            updateTracks(mediaManager)
-            val currentTrack = track
-            val albumID: Long = currentTrack.albumId
-            _idSong.value= currentTrack.id.toInt()
-            updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
+        Log.i("testPlayTrack", "testPlay ")
+        updateTracks(mediaManager)
+        val currentTrack = track
+        val albumID: Long = currentTrack.albumId
+        _idSong.value = currentTrack.id.toInt()
+        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
 
-            getMusicImg(albumID)
-            mediaPlayer.apply {
-                stop()
-                reset()
-                setDataSource(track.data)
-                prepare()
-                start()
+        getMusicImg(albumID)
+        mediaPlayer.apply {
+            stop()
+            reset()
+            setDataSource(track.data)
+            prepare()
+        }
+        updateSeekBar()
+
+    }
+
+    fun checkCurrentPosition(data: String) {
+        var i = 0
+        var q = 0
+        CoroutineScope(Dispatchers.IO).launch {
+            while (i in tracks.indices) {
+                if (tracks[q].data != data) {
+                    q++
+                    i++
+                } else {
+                    Log.i(TAG, "checkCurrentPosition $q$data")
+                    initTrack(tracks[q], data)
+                    break
+                }
             }
-            updateSeekBar()
-       // }
-
+        }
+        currentTrackPosition = q
     }
 
 
@@ -306,7 +360,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
 
     override fun firstOpenTrackFound(track: Track) {
-        Log.i("222", "$track ")
         updateTracks(mediaManager)
         val currentTrack = track
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
@@ -317,16 +370,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         when (mode) {
             SourceEnum.DISK -> {
+                updateSeekBar()
                 when (isPlaying()) {
                     true -> pause()
                     false -> resume()
                 }
             }
             SourceEnum.BT -> {
-
                 twManager.playerPlayPause()
-
-                Log.i("PoP", "play or pause")
             }
             SourceEnum.AUX -> TODO()
         }
@@ -388,10 +439,16 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                         tracks.size -> currentTrackPosition = 0
                         else -> currentTrackPosition++
                     }
-                    testPlay(tracks[currentTrackPosition])
+
                     when (isPlaying()) {
-                        true -> mediaPlayer.start()
+                        true -> {
+                            initTrack(tracks[currentTrackPosition], tracks[currentTrackPosition].data)
+                            mediaPlayer.start()
+                        }
+                        false->initTrack(tracks[currentTrackPosition], tracks[currentTrackPosition].data)
                     }
+                    Log.i("isPlaying", "${isPlaying()}")
+
                 }
             }
             SourceEnum.BT -> {
@@ -424,16 +481,18 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                         -1 -> currentTrackPosition = tracks.size - 1
                         else -> currentTrackPosition--
                     }
-                    testPlay(tracks[currentTrackPosition])
                     when (isPlaying()) {
-                        true -> mediaPlayer.start()
+                        true -> {
+                            initTrack(tracks[currentTrackPosition], tracks[currentTrackPosition].data)
+                            mediaPlayer.start()
+                        }
+                        false->initTrack(tracks[currentTrackPosition], tracks[currentTrackPosition].data)
                     }
                 }
 
             }
             SourceEnum.BT -> {
                 twManager.playerNext()
-                // updateMusicName(title.value,artist.value,duration.value)
             }
             SourceEnum.AUX -> {
 
@@ -454,17 +513,25 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
         }
     }
+    var playback: Playback? = null
 
     override fun onCreate() {
         super.onCreate()
-        (application as BaseApplication).getComponent<MusicComponent>().inject(this)
 
+        (application as BaseApplication).getComponent<MusicComponent>().inject(this)
+        init()
         registerReceiver(widgetIntentReceiver, IntentFilter(APP_WIDGET_UPDATE))
-        updateTracks(mediaManager)
+        playback = KamazPlayer(this)
+        (playback as KamazPlayer).setCallbacks(this)
+
+
         initMediaPlayer()
         startForeground()
-       startMusicListener()
+        startMusicListener()
         initLifecycleScope()
+
+        updateTracks(mediaManager)
+
         Log.i("init", "listener_work")
         twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
@@ -485,7 +552,15 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         isPlaying.launchOn(lifecycleScope) {
             widgettest.updatePlayPauseImg(this, it)
         }
-
+        if (tracks.isEmpty()) {
+            Log.d("mediaPlayer", "no")
+            _musicEmpty.value = true
+            _musicEmpty.value = false
+        } else {
+            // initTrack(tracks[currentTrackPosition], data.value)
+        }
+        queryLastMusic()
+        Log.i("testPlayTrack", "testPlay ")
     }
 
     private fun initLifecycleScope() {
@@ -530,7 +605,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-        val notification = notificationBuilder.setOngoing(true)
+        val notification = notificationBuilder
+            .setOngoing(true)
             .setSmallIcon(R.mipmap.sym_def_app_icon)
             .setPriority(PRIORITY_MIN)
             .setCategory(Notification.CATEGORY_SERVICE)
@@ -557,6 +633,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             tracks.addAll(result.r)
         }
     }
+
 
     override fun intMediaPlayer() {
         Log.d(TAG, "init")
@@ -614,12 +691,36 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun updateWidget(): StateFlow<Boolean> = isNotConnected
     override fun btModeOn(): StateFlow<Boolean> = isBtModeOn
     override fun diskModeOn(): StateFlow<Boolean> = _isDiskModeOn
-    override fun usbModeOn(): StateFlow<Boolean>  = isNotUSBConnected
+    override fun usbModeOn(): StateFlow<Boolean> = isNotUSBConnected
 
     override fun dialogFragment(): StateFlow<Boolean> = btDeviceIsConnecting
+    override fun musicEmpty(): StateFlow<Boolean> = musicEmpty
+
     override fun insertFavoriteMusic() {
-        val music = FavoriteSongs(idSong.value,title.value)
-       insertFavoriteMusic(InsertFavoriteMusic.Params(music))
+        val music = FavoriteSongs(idSong.value, title.value)
+        insertFavoriteMusic(InsertFavoriteMusic.Params(music))
+    }
+
+    override fun insertLastMusic() {
+        val music = HistorySongs(
+            18,
+            idSong.value,
+            title.value,
+            228,
+            1,
+            1,
+            data.value,
+            1,
+            1,
+            title.value,
+            1,
+            artist.value,
+            artist.value,
+            1
+        )
+        Log.i("insertLastMusic", music.data)
+
+        insertLastMusic(InsertLastMusic.Params(music))
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
@@ -630,7 +731,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         "BT Player state = $isPlaying".easyLog(this)
     }
-
 
 
     private val afChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
@@ -649,6 +749,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 // Raise volume to normal, restart playback if necessary
             }
         }
+    }
+
+    override fun onTrackWentToNext() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onTrackEnded() {
+        TODO("Not yet implemented")
     }
 
 }
