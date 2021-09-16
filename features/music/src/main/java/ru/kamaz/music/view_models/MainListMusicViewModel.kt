@@ -4,4 +4,6 @@ import android.app.Application
 import ru.sir.presentation.base.BaseViewModel
 import javax.inject.Inject
 
-class MainListMusicViewModel@Inject constructor(application: Application):BaseViewModel(application) {}
+class MainListMusicViewModel@Inject constructor
+    (application: Application)
+    :BaseViewModel(application) {}

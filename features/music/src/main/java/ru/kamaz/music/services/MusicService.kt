@@ -50,7 +50,7 @@ import javax.inject.Inject
 
 
 class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
-    MusicManagerListener, BluetoothManagerListener, Playback.PlaybackCallbacks {
+    MusicManagerListener, BluetoothManagerListener {
 
     val twManager = BluetoothManager()
     lateinit var device: BluetoothDevice
@@ -90,6 +90,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     @Inject
     lateinit var queryLastMusic: QueryLastMusic
 
+    @Inject
+    lateinit var queryFavoriteMusic: QueryFavoriteMusic
+    @Inject
+    lateinit var deleteFavoriteMusic: DeleteFavoriteMusic
+
+
     private val widget = MusicWidget.instance
     private val widgettest = TestWidget.instance
 
@@ -103,13 +109,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         _isNotUSBConnected.value = isAdded
 
-    }
-
-    fun updateTrack(mediaManager: MediaManager) {
-        val result = mediaManager.scanTracks()
-        if (result is Either.Right) {
-            tracks.addAll(result.r)
-        }
     }
 
     fun queryLastMusic() {
@@ -127,6 +126,21 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                     data.value
                 )  else checkCurrentPosition(it))
 
+            })
+        }
+    }
+
+    fun queryFavoriteMusic(){
+        Log.i("queryFavoriteMusic", "funWork")
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.i("queryFavoriteMusic", "duration${this}")
+            val it = queryFavoriteMusic.run(QueryFavoriteMusic.Params(data.value))
+            it.either({
+                Log.i("queryFavoriteMusic", "Failure${it}")
+            }, {
+                Log.i("queryFavoriteMusic", "duration${it}")
+                (if (it.isEmpty())      Log.i("queryFavoriteMusic", "duration${it}")
+                    else checkFavoriteMusic(it))
             })
         }
     }
@@ -193,6 +207,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _maxSeek = MutableStateFlow(0)
     val maxSeek = _maxSeek.asStateFlow()
 
+
+    private val _isFavorite = MutableStateFlow<Boolean>(false)
+    val isFavorite = _isFavorite.asStateFlow()
+
+
     private val _btDeviceIsConnecting = MutableStateFlow<Boolean>(false)
     val btDeviceIsConnecting = _btDeviceIsConnecting.asStateFlow()
     private val _musicEmpty = MutableStateFlow<Boolean>(false)
@@ -221,6 +240,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         AUX(1),
         DISK(2),
         USB(3)
+    }
+
+    enum class RepeatMusicEnum(val value: Int){
+        REPEAT_OFF(0),
+        REPEAT_ONE_SONG(1),
+        REPEAT_ALL(2)
     }
 
     override fun onBluetoothMusicDataChanged(name: String, artist: String) {
@@ -288,6 +313,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     fun initTrack(track: Track, data1: String) {
         Log.i("testPlayTrack", "$track$data1 ")
+        _isFavorite.value= false
         val currentTrack = track
         updateTracks(mediaManager)
         val albumID: Long = currentTrack.albumId
@@ -302,6 +328,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             setDataSource(if (data1.isEmpty()) track.data else data1)
             prepare()
         }
+        queryFavoriteMusic()
     }
 
     fun stopMediaPlayer() {
@@ -345,20 +372,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         currentTrackPosition = q
     }
 
-
-    private fun audioFocus(): Boolean {
-        return (getAudioManager()
-            .requestAudioFocus(
-                audioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN
-            )
-                == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
-    }
-
-    private val audioFocusListener =
-        OnAudioFocusChangeListener { focusChange ->
-
-        }
-
     override fun firstOpenTrackFound(track: Track) {
         updateTracks(mediaManager)
         val currentTrack = track
@@ -392,8 +405,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun getMusicImg(albumID: Long) {
-
-
         getMusicCover(GetMusicCover.Params(albumID)) {
             "Cover loaded: $it".easyLog(this)
             _cover.value = when (it) {
@@ -521,15 +532,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         (application as BaseApplication).getComponent<MusicComponent>().inject(this)
         init()
         registerReceiver(widgetIntentReceiver, IntentFilter(APP_WIDGET_UPDATE))
-        playback = KamazPlayer(this)
-        (playback as KamazPlayer).setCallbacks(this)
-
-
         initMediaPlayer()
         startForeground()
         startMusicListener()
         initLifecycleScope()
-
         updateTracks(mediaManager)
 
         Log.i("init", "listener_work")
@@ -646,6 +652,20 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
+    override fun howRepeatMode(repeat:RepeatMusicEnum){
+        when(repeat){
+            RepeatMusicEnum.REPEAT_OFF ->{
+
+            }
+            RepeatMusicEnum.REPEAT_ONE_SONG->{
+
+            }
+            RepeatMusicEnum.REPEAT_ALL->{
+
+            }
+        }
+    }
+
     override fun sourceSelection(action: SourceEnum) {
         when (action) {
             SourceEnum.BT -> {
@@ -684,6 +704,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun getMusicDuration(): StateFlow<String> = duration
 
+    override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
+
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isNotUSBConnected
@@ -697,8 +719,37 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun musicEmpty(): StateFlow<Boolean> = musicEmpty
 
     override fun insertFavoriteMusic() {
-        val music = FavoriteSongs(idSong.value, title.value)
-        insertFavoriteMusic(InsertFavoriteMusic.Params(music))
+        queryFavoriteMusic()
+        if (isFavorite.value){
+            deleteFavoriteMusic()
+        }else{
+            _isFavorite.value= true
+            val music = FavoriteSongs(idSong.value, data.value)
+            Log.i("insertFavoriteMusic", music.data)
+            insertFavoriteMusic(InsertFavoriteMusic.Params(music))
+        }
+    }
+
+    override fun deleteFavoriteMusic() {
+        _isFavorite.value= false
+        val music = FavoriteSongs(idSong.value, data.value)
+        Log.i("insertFavoriteMusic", music.data)
+        deleteFavoriteMusic(DeleteFavoriteMusic.Params(music))
+    }
+
+    fun checkFavoriteMusic(data: String){
+        var i = 0
+        CoroutineScope(Dispatchers.IO).launch {
+            while (i in tracks.indices) {
+                if (tracks[i].data != data) {
+                    i++
+                } else {
+                    Log.i("checkFavoriteMusic", "checkCurrentPosition $i$data")
+                    _isFavorite.value=true
+                    break
+                }
+            }
+        }
     }
 
     override fun insertLastMusic() {
@@ -722,6 +773,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         insertLastMusic(InsertLastMusic.Params(music))
     }
+
+   fun checkRepeatState(){
+
+   }
 
     override fun onCompletion(mp: MediaPlayer?) {
 
@@ -751,12 +806,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    override fun onTrackWentToNext() {
-        TODO("Not yet implemented")
-    }
 
-    override fun onTrackEnded() {
-        TODO("Not yet implemented")
-    }
 
 }

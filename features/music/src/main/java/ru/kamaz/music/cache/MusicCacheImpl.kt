@@ -7,6 +7,7 @@ import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.ErrorMessage
+import ru.kamaz.music_api.models.FavoriteSongs
 import ru.sir.core.Either
 import ru.sir.core.None
 import java.lang.Exception
@@ -15,11 +16,15 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
     override fun getLastMusic(): String = prefsManager.getLastMusic()
     override fun saveLastMusic(lastMusic: String)  = prefsManager.saveMusicInfo(lastMusic)
     override fun insertFavoriteSong(song: FavoriteSongsEntity): Either<Failure, None> {
+        Log.i("insertFavoriteMusic", song.data)
         db.userDao().insertAll(song)
         return Either.Right(None())
     }
-    override fun queryFavoriteSongs(): List<FavoriteSongsEntity> {
-        TODO("Not yet implemented")
+
+    override fun deleteFavoriteSong(song: FavoriteSongsEntity): Either<Failure, None> {
+        Log.i("deleteFavoriteSong", "insertHistorySong: ${song.data}")
+        db.userDao().delete(song)
+        return Either.Right(None())
     }
 
     override fun queryHistorySongs(): Either<Failure, String> {
@@ -38,8 +43,29 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         return Either.Right(None())
     }
 
-   /* override fun queryHistorySongs(): Either<Failure,List<HistorySongsEntity>> {
-      val list  =db.historySongsDao().loadAll()
-        return Either.Right(list)
+    override fun queryFavoriteSongs(data: String): Either<Failure, String> {
+        return try {
+            Log.i("database", "queryHistorySongs try")
+            Either.Right(db.userDao().loadAll(data).data)
+        } catch (e: Exception) {
+            Log.i("database", "queryHistorySongs false")
+            Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
+        }
+
+    }
+
+   /* override fun queryFavoriteSongs(): Either<Failure, String> {
+        return try {
+            Log.i("database", "queryHistorySongs try")
+            Either.Right(db.userDao().loadAll)
+        } catch (e: Exception) {
+            Log.i("database", "queryHistorySongs false")
+            Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
+        }
     }*/
+
+    /* override fun queryHistorySongs(): Either<Failure,List<HistorySongsEntity>> {
+       val list  =db.historySongsDao().loadAll()
+         return Either.Right(list)
+     }*/
 }

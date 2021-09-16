@@ -62,6 +62,11 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.checkBTConnection() ?: MutableStateFlow(true)
     }
 
+
+    val isFavoriteMusic: StateFlow<Boolean> by lazy {
+        service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
+    }
+
     val isNotConnectedUsb: StateFlow<Boolean> by lazy {
         service.value?.checkUSBConnection() ?: MutableStateFlow(false)
     }
@@ -107,12 +112,12 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun init() {
-     /*   val audioAttributes: AudioAttributes = AudioAttributes.Builder()
+        val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
         mediaPlayer.setOnCompletionListener(this)
-        mediaPlayer.setAudioAttributes(audioAttributes)*/
+        mediaPlayer.setAudioAttributes(audioAttributes)
 
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
@@ -180,6 +185,21 @@ class MusicFragmentViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun howModeRepeat(mode: MusicService.RepeatMusicEnum){
+        when(mode){
+            MusicService.RepeatMusicEnum.REPEAT_OFF->{
+                service.value?.howRepeatMode(mode)
+            }
+            MusicService.RepeatMusicEnum.REPEAT_ONE_SONG->{
+                service.value?.howRepeatMode(mode)
+
+            }
+            MusicService.RepeatMusicEnum.REPEAT_ALL->{
+                service.value?.howRepeatMode(mode)
+            }
+        }
     }
 
     fun musicEmpty() {

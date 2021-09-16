@@ -19,4 +19,8 @@
         android:id="@+id/fragment_dialog"
         android:name="ru.kamaz.music.ui.dialog_windows.DialogBtSettings"
         android:label="DialogBtSettings" />
+    <fragment
+        android:id="@+id/mainListMusicFragment"
+        android:name="ru.kamaz.music.ui.MainListMusicFragment"
+        android:label="MainListMusicFragment" />
 </navigation>

@@ -23,4 +23,8 @@ class DomainModule {
     fun provideInsertLastMusic(repository: Repository): InsertLastMusic = InsertLastMusic(repository)
     @Provides
     fun provideQueryLastMusic(repository: Repository): QueryLastMusic = QueryLastMusic(repository)
+    @Provides
+    fun provideQueryFavoriteMusic(repository: Repository): QueryFavoriteMusic = QueryFavoriteMusic(repository)
+    @Provides
+    fun provideDeleteFavoriteMusic(repository: Repository): DeleteFavoriteMusic = DeleteFavoriteMusic(repository)
 }

@@ -37,8 +37,11 @@ interface MusicServiceInterface{
         fun usbModeOn():StateFlow<Boolean>
         fun dialogFragment():StateFlow<Boolean>
         fun musicEmpty():StateFlow<Boolean>
+        fun isFavoriteMusic():StateFlow<Boolean>
         fun insertFavoriteMusic()
+        fun deleteFavoriteMusic()
         fun insertLastMusic()
+       fun howRepeatMode(repeat: MusicService.RepeatMusicEnum)
 
     }
 

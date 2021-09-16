@@ -9,7 +9,7 @@ data class FavoriteSongsEntity(
     @PrimaryKey
     @ColumnInfo(name = "id_song")
     var idSong: Int,
-    @ColumnInfo(name = "artist")
-    var name: String
+    @ColumnInfo(name = "data")
+    var data: String
 )
 

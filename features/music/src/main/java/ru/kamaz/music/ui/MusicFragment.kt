@@ -91,10 +91,14 @@ class MusicFragment :
         binding.controlPanel.like.setOnClickListener {
             viewModel.isSaveFavoriteMusic()
         }
+        binding.controlPanel.repeat.setOnClickListener {
+             viewModel.howModeRepeat(MusicService.RepeatMusicEnum.REPEAT_OFF)
+        }
 
 
         binding.seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                Log.i("SEEk", "bool $b int $i")
                 if (b) {
                     viewModel.checkPosition(i)
                 }
@@ -154,6 +158,7 @@ class MusicFragment :
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
+            Log.i("duration", "$it ")
             val currentPosition = if (it < 0) 0 else it
             binding.seek.progress = currentPosition
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
@@ -188,6 +193,15 @@ class MusicFragment :
                 usbModeActivation()
             } else {
                 diskModeActivation()
+            }
+        }
+
+        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope){
+            Log.i("isFavorite", "isFavorite$it")
+            if (it){
+                binding.controlPanel.like.setImageResource(R.drawable.ic_like_true)
+            }else{
+                binding.controlPanel.like.setImageResource(R.drawable.ic_like_false)
             }
         }
 
@@ -244,6 +258,7 @@ class MusicFragment :
 
         startActivity(intent)
     }
+
 
     fun btModeActivation() {
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE

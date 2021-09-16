@@ -2,12 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#121212"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <include
-        android:id="@+id/toolbarContainer"
-        layout="@layout/toolbar"/>
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"
         android:layout_width="match_parent"
@@ -17,69 +14,34 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_weight="1"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
         >
     </androidx.appcompat.widget.SearchView>
 
-    <FrameLayout
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/view_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="4"
-        app:layout_constraintBottom_toTopOf="@+id/folder_bottoms"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search"
-        app:layout_constraintEnd_toEndOf="parent" />
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/folder_bottoms"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintVertical_weight="1"
+        app:layout_constraintVertical_weight="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_fragment"
-        app:layout_constraintEnd_toEndOf="parent">
-        <TextView
-            android:id="@+id/aux"
-            style="@style/Button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_bt"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf=" parent"
-            android:text="1"
-            android:textColor="@color/white"
-            android:layout_marginStart="@dimen/marginTop"
-            android:layout_marginEnd="@dimen/marginTop"
-            android:gravity="center"
-            />
+        app:layout_constraintTop_toBottomOf="@+id/search"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical">
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/btn_bt"
-            style="@style/Button"
-            android:layout_marginStart="@dimen/marginTop"
-            android:layout_marginEnd="@dimen/marginTop"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/disk"
-            app:layout_constraintStart_toEndOf="@id/aux"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="2"
-            android:gravity="center"
-            android:textColor="@color/white"
-            />
-        <TextView
-            android:id="@+id/disk"
-            style="@style/Button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_bt"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginStart="@dimen/marginTop"
-            android:layout_marginEnd="@dimen/marginTop"
-            android:text="3"
-            android:gravity="center"
-            android:textColor="@color/white"
-            />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            app:tabPaddingEnd="200dp"
+            app:tabPaddingStart="200dp"
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,8 +14,9 @@ interface Repository {
     fun getMusicPositionFlow(): Flow<Int>
     fun lastTrack(): Either<None, String>
     fun insertFavoriteSong(song: FavoriteSongs): Either<Failure, None>
+    fun deleteFavoriteSong(song: FavoriteSongs): Either<Failure, None>
     fun insertHistorySong(song: HistorySongs): Either<Failure, None>
-    fun queryFavoriteSongs() : List<FavoriteSongs>
+    fun queryFavoriteSongs(data:String) :  Either<Failure, String>
     fun queryHistorySongs() : Either<Failure, String>
 
 

@@ -16,7 +16,7 @@ class MainActivity : BaseActivity() {
 
     override fun navigateTo(action: UiAction) {
         when (action.id) {
-            NavAction.OPEN_TRACK_LIST_FRAGMENT-> {navigator.navigate(R.id.trackFragment)}
+            NavAction.OPEN_TRACK_LIST_FRAGMENT-> {navigator.navigate(R.id.mainListMusicFragment)}
             NavAction.OPEN_BT_FRAGMENT-> {navigator.navigate(R.id.btFragment)}
         //    NavAction.OPEN_DIALOG_FRAGMENT->{navigator.navigate(R.id.)}
         }

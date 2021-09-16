@@ -4,6 +4,6 @@ import java.io.Serializable
 
 
 data class FavoriteSongs(val idSong: Int,
-                         val name:String
+                         val data:String
                         ) : Serializable
 

@@ -23,8 +23,10 @@ class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: M
     override fun getMusicCover(albumId: Long): Either<None, String> = media.getAlbumImagePath(albumId)
 
     override fun getMusicPositionFlow(): Flow<Int> = flow {
+
         while (true) {
             val currentPosition = mediaPlayer.currentPosition
+            Log.i("getMusicPositionFlow", "INSERT: $currentPosition")
             emit(currentPosition)
             delay(1000)
         }
@@ -35,18 +37,20 @@ class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: M
     }
 
     override fun insertFavoriteSong(song: FavoriteSongs): Either<Failure, None> = testDBDao.insertFavoriteSong(song.toDao())
+    override fun deleteFavoriteSong(song: FavoriteSongs): Either<Failure, None> = testDBDao.deleteFavoriteSong(song.toDao())
+
     override fun insertHistorySong(song: HistorySongs): Either<Failure, None> {
         val r = testDBDao.insertHistorySong(song.toDao())
         Log.i("insertHistorySong", "INSERT: $r")
         return r
     }
 
-    override fun queryFavoriteSongs(): List<FavoriteSongs> {
-        TODO("Not yet implemented")
-    }
+    override fun queryFavoriteSongs(data: String): Either<Failure, String> = testDBDao.queryFavoriteSongs(data)
+
+   // override fun queryFavoriteSongs():  Either<Failure, String> = testDBDao.queryFavoriteSongs()
 
     override fun queryHistorySongs(): Either<Failure, String> = testDBDao.queryHistorySongs()
-    private fun FavoriteSongs.toDao() = FavoriteSongsEntity(this.idSong, this.name)
+    private fun FavoriteSongs.toDao() = FavoriteSongsEntity(this.idSong, this.data)
     private fun HistorySongs.toDao() = HistorySongsEntity(this.dbID,this.idCursor,this.title,this.trackNumber,this.year,this.duration,this.data,this.dateModified,this.albumId,this.albumName,this.artistId,this.artistName,this.albumArtist,this.albumArtist,this.timePlayed)
 
 }
