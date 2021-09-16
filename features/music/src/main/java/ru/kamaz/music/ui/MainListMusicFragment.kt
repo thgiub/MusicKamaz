@@ -3,16 +3,14 @@ package ru.kamaz.music.ui
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.tabs.TabLayoutMediator
-import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
-import ru.kamaz.music.ui.music_сategory.MusicCategoryFragment
+import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
 import ru.kamaz.music.view_models.MainListMusicViewModel
+import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
+import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 
 
 class MainListMusicFragment
@@ -21,6 +19,13 @@ class MainListMusicFragment
         app.getComponent<MusicComponent>().inject(this)
     }
 
+    private var holder = MusicCategoryEnum.LIST_ALL_MUSIC
+
+    enum class MusicCategoryEnum(int: Int){
+        LIST_ALL_MUSIC(0),
+        FOLDER_WITH_MUSIC(1),
+        CATEGORY_MUSIC(2)
+    }
     override fun initBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -28,35 +33,51 @@ class MainListMusicFragment
     ) = FragmentMainListMusicBinding.inflate(inflater, container, false)
 
     override fun initVars() {
-        super.initVars()
-        binding.pager.adapter = FragmentAdapter(this)
-        TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
-           // tab.text = "OBJECT ${(position + 1)}"
-           when(position){
-               0->tab.setIcon(R.drawable.ic_play)
-               1->tab.setIcon(R.drawable.ic_next)
-               2->tab.setIcon(R.drawable.ic_like_false)
-           }
-        }.attach()
+        updateRecyclerViewAdapter(holder)
+        //binding.rvAllMusic.adapter = recyclerViewAdapter()
     }
 
-
-}
-
-class FragmentAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
-    override fun getItemCount(): Int {
-        return 3
+    override fun setListeners() {
+        binding.sourceSelection.listMusic.setOnClickListener {
+            MusicCategoryEnum.LIST_ALL_MUSIC
+        }
+        binding.sourceSelection.folderMusic.setOnClickListener {
+            MusicCategoryEnum.FOLDER_WITH_MUSIC
+        }
+        binding.sourceSelection.categoryMusic.setOnClickListener {
+            MusicCategoryEnum.CATEGORY_MUSIC
+        }
+        super.setListeners()
     }
 
-    override fun createFragment(position: Int): Fragment {
+    fun onTrackClicked(track: Track) {
+        viewModel.onItemClick(track)
+    }
 
-        return when(position){
-            0 -> MusicCategoryFragment()
-            1 -> TrackFragment()
-            2 -> TrackFragment()
-            else -> TrackFragment()
+    fun updateRecyclerViewAdapter(holder:MusicCategoryEnum ){
+        when(holder){
+            MusicCategoryEnum.LIST_ALL_MUSIC-> startListAllMusic()
+            MusicCategoryEnum.CATEGORY_MUSIC->startCategoryMusic()
+            MusicCategoryEnum.FOLDER_WITH_MUSIC->startFolderWithMusic()
         }
     }
+
+    private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
+        .addProducer(MusicListViewHolderProducer())
+        .build { it }
+
+    fun startFolderWithMusic(){
+        this.holder=MusicCategoryEnum.FOLDER_WITH_MUSIC
+    }
+    fun startListAllMusic(){
+        this.holder=MusicCategoryEnum.LIST_ALL_MUSIC
+        binding.rvAllMusic.adapter = recyclerViewAdapter()
+    }
+
+    fun startCategoryMusic(){
+        this.holder=MusicCategoryEnum.CATEGORY_MUSIC
+    }
 }
+
+
 

@@ -135,8 +135,8 @@ class MusicFragment :
 
     private fun initServiceVars() {
         viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
-            if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_music)
-            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play)
+            if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
+            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_white)
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {

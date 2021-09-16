@@ -59,6 +59,19 @@
         <item name="android:background">@drawable/back_item</item>
     </style>
 
+    <style name="ButtonCategoryOff">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_category_music_off</item>
+    </style>
+    <style name="ButtonCategoryOn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_category_music_on</item>
+    </style>
+
     <style name="ButtonOn">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>

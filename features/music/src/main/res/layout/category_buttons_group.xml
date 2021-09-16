@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/view_change_source"
+    android:orientation="horizontal"
+    android:layout_marginTop="@dimen/marginTop"
+    android:layout_marginBottom="@dimen/marginTop"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/folder_music"
+        style="@style/ButtonCategoryOff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/list_music"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf=" parent"
+        android:src="@drawable/ic_folder_music"
+        android:textColor="@color/white"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        android:gravity="center"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+
+    android:id="@+id/list_music"
+        style="@style/ButtonCategoryOff"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/category_music"
+        app:layout_constraintStart_toEndOf="@id/folder_music"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:src="@drawable/ic_music_nota"
+
+        android:textColor="@color/white"
+        />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/category_music"
+        style="@style/ButtonCategoryOff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/list_music"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        android:gravity="center"
+        android:src="@drawable/open_track_list"
+        android:textColor="@color/white"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

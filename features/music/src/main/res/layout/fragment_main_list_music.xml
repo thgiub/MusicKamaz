@@ -9,39 +9,42 @@
         android:id="@+id/search"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/view_fragment"
+        app:layout_constraintBottom_toTopOf="@+id/rv_all_music"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_weight="1"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="80dp"
         android:layout_marginEnd="80dp"
         >
     </androidx.appcompat.widget.SearchView>
 
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/view_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintVertical_weight="10"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_all_music"
         app:layout_constraintTop_toBottomOf="@+id/search"
+        app:layout_constraintBottom_toTopOf="@+id/source_selection"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical">
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        android:layout_width="match_parent"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
+        app:layout_constraintVertical_weight="8"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_height="0dp">
+    </androidx.recyclerview.widget.RecyclerView>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            app:tabPaddingEnd="200dp"
-            app:tabPaddingStart="200dp"
-            android:layout_width="match_parent"
-            android:layout_height="100dp" />
-    </LinearLayout>
+    <include
+        android:id="@+id/source_selection"
+        layout="@layout/category_buttons_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintVertical_weight="1"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rv_all_music"
+ />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
