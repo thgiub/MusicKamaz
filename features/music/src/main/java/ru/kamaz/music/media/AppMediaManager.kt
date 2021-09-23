@@ -1,8 +1,10 @@
- package ru.kamaz.music.media
+package ru.kamaz.music.media
 
 import android.content.Context
 import android.provider.MediaStore
+import ru.kamaz.music.R
 import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.None
@@ -59,7 +61,7 @@ class AppMediaManager  @Inject constructor( val context: Context)
         return Either.Right(array)
     }
 
-    override fun scanUSBTracks():Either<None,List<Track>> {
+    override fun scanUSBTracks(): Either<None, List<Track>> {
         val array = ArrayList<Track>()
 
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -69,24 +71,33 @@ class AppMediaManager  @Inject constructor( val context: Context)
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.ALBUM_ID)
+            MediaStore.Audio.Media.ALBUM_ID
+        )
 
         val selection = "${MediaStore.Audio.Media.IS_MUSIC}  != 0"
         val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
 
         val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)
 
-        if(cursor != null) {
+        if (cursor != null) {
             cursor.moveToFirst()
 
-            while(!cursor.isAfterLast) {
-                val id = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
+            while (!cursor.isAfterLast) {
+                val id =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val duration = Track.convertDuration(cursor.getString(cursor.getColumnIndex(
-                    MediaStore.Audio.Media.DURATION)).toLong())
-                val albumId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)).toLong()
+                val duration = Track.convertDuration(
+                    cursor.getString(
+                        cursor.getColumnIndex(
+                            MediaStore.Audio.Media.DURATION
+                        )
+                    ).toLong()
+                )
+                val albumId =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
+                        .toLong()
 
                 cursor.moveToNext()
 
@@ -126,5 +137,80 @@ class AppMediaManager  @Inject constructor( val context: Context)
 
         return if (albumPath == null) Either.Left(None()) else Either.Right(albumPath)
     }
+
+    override fun getCategory(): Either<None, List<CategoryMusicModel>> {
+
+        val array = ArrayList<CategoryMusicModel>()
+
+        val category = listOf(
+            CategoryMusicModel(R.drawable.ic_like_false, "Избранное"),
+            CategoryMusicModel(R.drawable.ic_like_false, "Исполнители"),
+            CategoryMusicModel(R.drawable.ic_like_false, "Жанры"),
+            CategoryMusicModel(R.drawable.ic_like_false, "Альбомы"),
+            CategoryMusicModel(R.drawable.ic_like_false, "Плейлисты"),
+        )
+        array.addAll(category)
+        return Either.Right(array)
+    }
+
+  /*  override fun getFolderWithMusic(): Either<None, List<FolderMusicModel>> {
+
+        val array = ArrayList<FolderMusicModel>()
+
+     *//*   val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.ALBUM_ID
+        )
+
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC}  != 0"
+        val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
+
+        val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)
+
+        if (cursor != null) {
+
+
+            while (!cursor.isAfterLast) {
+                val id =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
+                val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+                val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
+                val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
+                val duration = Track.convertDuration(
+                    cursor.getString(
+                        cursor.getColumnIndex(
+                            MediaStore.Audio.Media.DURATION
+                        )
+                    ).toLong()
+                )
+                val albumId =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
+                        .toLong()
+                val type =
+
+                cursor.moveToNext()
+
+                array.add(
+                    FolderMusicModel(
+                        id,
+                        title,
+                        artist,
+                        data,
+                        duration,
+                        albumId
+                    )
+                )
+            }
+            cursor.close()
+        }*//*
+
+        return Either.Right(array)
+    }*/
+
 
 }

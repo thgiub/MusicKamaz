@@ -14,5 +14,6 @@ interface MusicCache {
     fun deleteFavoriteSong(song: FavoriteSongsEntity): Either<Failure, None>
     fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None>
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
+    fun getAllFavoriteSongs(): Either<Failure, String>
     fun queryHistorySongs(): Either<Failure, String>
 }

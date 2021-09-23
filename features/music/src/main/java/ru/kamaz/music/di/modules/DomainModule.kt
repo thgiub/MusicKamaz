@@ -12,6 +12,9 @@ class DomainModule {
     fun provideLoadData(repository: Repository): LoadData = LoadData(repository)
 
     @Provides
+    fun provideCategoryLoadRV(repository: Repository): CategoryLoadRV = CategoryLoadRV(repository)
+
+    @Provides
     fun provideGetMusicCover(repository: Repository): GetMusicCover = GetMusicCover(repository)
 
     @Provides
@@ -25,6 +28,8 @@ class DomainModule {
     fun provideQueryLastMusic(repository: Repository): QueryLastMusic = QueryLastMusic(repository)
     @Provides
     fun provideQueryFavoriteMusic(repository: Repository): QueryFavoriteMusic = QueryFavoriteMusic(repository)
+   @Provides
+    fun provideFavoriteMusicRV(repository: Repository): FavoriteMusicRV = FavoriteMusicRV(repository)
     @Provides
     fun provideDeleteFavoriteMusic(repository: Repository): DeleteFavoriteMusic = DeleteFavoriteMusic(repository)
 }

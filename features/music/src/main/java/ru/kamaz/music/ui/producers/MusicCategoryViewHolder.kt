@@ -3,14 +3,15 @@ package ru.kamaz.music.ui.producers
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import ru.kamaz.music.databinding.ImageTextItemBinding
-import ru.kamaz.music.databinding.TestTextItemBinding
-import ru.kamaz.music.view_models.ItemViewModel
-import ru.kamaz.music_api.models.Track
+import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_CATEGORY
+import ru.kamaz.music.view_models.MusicCategoryViewModel
+import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.sir.presentation.base.recycler_view.ViewHolderProducer
 
-class MusicCategoryViewHolder: ViewHolderProducer<Track, ItemViewModel, TestTextItemBinding>(
-    ItemType.RV_ITEM_MUSIC_CATEGORY, Track::class.java, ItemViewModel::class.java){
+class MusicCategoryViewHolder : ViewHolderProducer<CategoryMusicModel, MusicCategoryViewModel, ImageTextItemBinding >(
+   RV_ITEM_MUSIC_CATEGORY, CategoryMusicModel::class.java, MusicCategoryViewModel::class.java
+) {
     override fun initBinding(inflater: LayoutInflater, parent: ViewGroup) =
-        TestTextItemBinding.inflate(inflater,parent,false)
+        ImageTextItemBinding.inflate(inflater, parent, false)
 
 }

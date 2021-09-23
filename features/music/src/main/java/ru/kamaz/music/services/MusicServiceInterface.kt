@@ -11,7 +11,6 @@ interface MusicServiceInterface{
     interface Service{
         fun setViewModel(viewModel:ViewModel)
         fun init()
-       //fun startTrack(context: Context)
         fun playOrPause(): Boolean
         fun testPlay(track: Track)
         fun firstOpenTrackFound(track: Track)
@@ -39,10 +38,12 @@ interface MusicServiceInterface{
         fun musicEmpty():StateFlow<Boolean>
         fun isFavoriteMusic():StateFlow<Boolean>
         fun insertFavoriteMusic()
+        fun shuffleStatusChange()
         fun deleteFavoriteMusic()
         fun insertLastMusic()
-       fun howRepeatMode(repeat: MusicService.RepeatMusicEnum)
-
+        fun getRepeat(): StateFlow<Int>
+        fun changeRepeatMode()
+        fun isShuffleOn(): StateFlow<Boolean>
     }
 
     interface ViewModel{

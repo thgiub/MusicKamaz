@@ -10,6 +10,7 @@ import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.interfaces.Repository
+import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.HistorySongs
 
@@ -20,10 +21,12 @@ import ru.sir.core.None
 
 class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: MediaPlayer, private val testDBDao: MusicCache): Repository {
     override fun loadData(): Either<None, List<Track>> = media.scanTracks()
+    override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
+    override fun rvFavorite(): Either<Failure, String> =testDBDao.getAllFavoriteSongs()
+
     override fun getMusicCover(albumId: Long): Either<None, String> = media.getAlbumImagePath(albumId)
 
     override fun getMusicPositionFlow(): Flow<Int> = flow {
-
         while (true) {
             val currentPosition = mediaPlayer.currentPosition
             Log.i("getMusicPositionFlow", "INSERT: $currentPosition")

@@ -13,14 +13,11 @@ import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
-import ru.biozzlab.twmanager.managers.MusicManager
 import ru.biozzlab.twmanager.utils.easyLog
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.GetMusicPosition
-import ru.kamaz.music_api.interactor.InsertFavoriteMusic
-import ru.kamaz.music_api.interfaces.Repository
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.presentation.base.BaseViewModel
@@ -44,6 +41,9 @@ class MusicFragmentViewModel @Inject constructor(
     val artist: StateFlow<String> by lazy {
       service.value?.getArtistName() ?: MutableStateFlow("Unknown")
     }
+    val repeatHowModeNow: StateFlow<Int> by lazy {
+      service.value?.getRepeat() ?: MutableStateFlow(0)
+    }
 
     val title: StateFlow<String> by lazy {
         service.value?.getMusicName() ?: MutableStateFlow("Unknown")
@@ -52,7 +52,9 @@ class MusicFragmentViewModel @Inject constructor(
     val duration: StateFlow<String> by lazy {
         service.value?.getMusicDuration() ?: MutableStateFlow("--:--")
     }
-
+    val isShuffleOn: StateFlow<Boolean> by lazy {
+        service.value?.isShuffleOn() ?: MutableStateFlow(true)
+    }
 
     val isNotConnected: StateFlow<Boolean> by lazy {
         service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
@@ -87,9 +89,6 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.dialogFragment()?: MutableStateFlow(false)
     }
 
-    /*private val _duration = MutableStateFlow("--:--")
-    val duration = _duration.asStateFlow()*/
-
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
 
@@ -107,7 +106,6 @@ class MusicFragmentViewModel @Inject constructor(
     val maxSeek = _maxSeek.asStateFlow()
 
     override fun onDestroy() {
-      // mediaPlayer.release()
         super.onDestroy()
     }
 
@@ -138,10 +136,13 @@ class MusicFragmentViewModel @Inject constructor(
 
     }
 
+    fun shuffleStatusChange(){
+        service.value?.shuffleStatusChange()
+    }
+
     fun playOrPause() {
         _isPlaying.value = service.value?.playOrPause() ?: false
     }
-
 
     fun checkPosition(position: Int) {
         service.value?.checkPosition(position)
@@ -186,20 +187,8 @@ class MusicFragmentViewModel @Inject constructor(
         }
 
     }
-
-    fun howModeRepeat(mode: MusicService.RepeatMusicEnum){
-        when(mode){
-            MusicService.RepeatMusicEnum.REPEAT_OFF->{
-                service.value?.howRepeatMode(mode)
-            }
-            MusicService.RepeatMusicEnum.REPEAT_ONE_SONG->{
-                service.value?.howRepeatMode(mode)
-
-            }
-            MusicService.RepeatMusicEnum.REPEAT_ALL->{
-                service.value?.howRepeatMode(mode)
-            }
-        }
+    fun repeatChange(){
+        service.value?.changeRepeatMode()
     }
 
     fun musicEmpty() {
@@ -246,8 +235,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun selectBtMode() {
-        Log.d("test", "${_btModeActivation.value} hui")
-        Log.d("test", "${_btModeActivation.value} hui")
+
     }
 
 

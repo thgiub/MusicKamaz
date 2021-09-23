@@ -54,15 +54,24 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
 
     }
 
-   /* override fun queryFavoriteSongs(): Either<Failure, String> {
+    override fun getAllFavoriteSongs(): Either<Failure, String> {
         return try {
-            Log.i("database", "queryHistorySongs try")
-            Either.Right(db.userDao().loadAll)
+            Either.Right(db.userDao().getData().data)
         } catch (e: Exception) {
             Log.i("database", "queryHistorySongs false")
             Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
         }
-    }*/
+    }
+
+    /* override fun queryFavoriteSongs(): Either<Failure, String> {
+         return try {
+             Log.i("database", "queryHistorySongs try")
+             Either.Right(db.userDao().loadAll)
+         } catch (e: Exception) {
+             Log.i("database", "queryHistorySongs false")
+             Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
+         }
+     }*/
 
     /* override fun queryHistorySongs(): Either<Failure,List<HistorySongsEntity>> {
        val list  =db.historySongsDao().loadAll()

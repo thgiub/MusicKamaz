@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -63,6 +62,7 @@ class MusicFragment :
             }
         binding.controlPanel.rotate.setOnClickListener {
             viewModel.startTrack()
+            viewModel.shuffleStatusChange()
         }
         binding.prev.setOnClickListener {
             viewModel.previousTrack()
@@ -92,7 +92,7 @@ class MusicFragment :
             viewModel.isSaveFavoriteMusic()
         }
         binding.controlPanel.repeat.setOnClickListener {
-             viewModel.howModeRepeat(MusicService.RepeatMusicEnum.REPEAT_OFF)
+             viewModel.repeatChange()
         }
 
 
@@ -157,6 +157,10 @@ class MusicFragment :
             binding.seek.max = it
         }
 
+        viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope){
+          repeatIconChange(it)
+        }
+
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
             Log.i("duration", "$it ")
             val currentPosition = if (it < 0) 0 else it
@@ -188,6 +192,10 @@ class MusicFragment :
             }
         }
 
+        viewModel.isShuffleOn.launchWhenStarted(lifecycleScope){
+            randomSongStatus(it)
+        }
+
         viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope) {
             if (it) {
                 usbModeActivation()
@@ -197,12 +205,7 @@ class MusicFragment :
         }
 
         viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope){
-            Log.i("isFavorite", "isFavorite$it")
-            if (it){
-                binding.controlPanel.like.setImageResource(R.drawable.ic_like_true)
-            }else{
-                binding.controlPanel.like.setImageResource(R.drawable.ic_like_false)
-            }
+          likeStatus(it)
         }
 
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope){
@@ -234,7 +237,7 @@ class MusicFragment :
         }
     }
 
-    fun dialog(){
+    private fun dialog(){
         AlertDialog.Builder(context)
             .setTitle("Нет подключения по Bt")
             .setMessage("Перейдти в настройки для подключения устройства по BT")
@@ -259,6 +262,28 @@ class MusicFragment :
         startActivity(intent)
     }
 
+    private fun repeatIconChange(repeat:Int){
+        when(repeat){
+            0->binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
+            1->binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_one)
+            2->binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_all)
+        }
+
+    }
+
+    private fun randomSongStatus(random: Boolean){
+        if(random) binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_blue)
+        else binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_white)
+    }
+
+    private fun likeStatus(like:Boolean){
+        Log.i("isFavorite", "isFavorite")
+        if (like){
+            binding.controlPanel.like.setImageResource(R.drawable.ic_like_true)
+        }else{
+            binding.controlPanel.like.setImageResource(R.drawable.ic_like_false)
+        }
+    }
 
     fun btModeActivation() {
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
