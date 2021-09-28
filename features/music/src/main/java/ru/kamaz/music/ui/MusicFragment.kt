@@ -285,6 +285,7 @@ class MusicFragment :
         }
     }
 
+
     fun btModeActivation() {
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
@@ -299,6 +300,8 @@ class MusicFragment :
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.INVISIBLE
+        binding.picture.visibility = View.VISIBLE
+        binding.pictureDevice.visibility = View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
@@ -327,16 +330,15 @@ class MusicFragment :
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.setBackgroundResource(R.drawable.albom)
+        binding.picture.visibility = View.INVISIBLE
+        binding.pictureDevice.visibility = View.VISIBLE
+        binding.pictureDevice.setBackgroundResource(R.drawable.albom)
         binding.textUsb.visibility = View.INVISIBLE
-        //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
     }
 
     fun auxModeActivation() {
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
-       /* changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.viewChangeSource)*/
         binding.controlPanel.repeat.visibility = View.INVISIBLE
         binding.controlPanel.rotate.visibility = View.INVISIBLE
         binding.controlPanel.like.visibility = View.INVISIBLE
@@ -348,6 +350,8 @@ class MusicFragment :
         binding.artist.visibility = View.INVISIBLE
         binding.song.visibility = View.INVISIBLE
         binding.times.visibility = View.INVISIBLE
+        binding.picture.visibility = View.VISIBLE
+        binding.pictureDevice.visibility = View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
@@ -360,8 +364,6 @@ class MusicFragment :
     fun usbModeActivation() {
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
-      /*  changeSource(binding.controlPanel.pop)
-        changeSource(binding.sourceSelection.viewChangeSource)*/
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
         binding.controlPanel.repeat.visibility = View.VISIBLE
         binding.controlPanel.rotate.visibility = View.VISIBLE
@@ -375,13 +377,14 @@ class MusicFragment :
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
         binding.textUsb.visibility = View.VISIBLE
+        binding.picture.visibility = View.VISIBLE
+        binding.pictureDevice.visibility = View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.picture.setBackgroundResource(R.drawable.albom)
         binding.sourceSelection
-        //   viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
     }
 
 

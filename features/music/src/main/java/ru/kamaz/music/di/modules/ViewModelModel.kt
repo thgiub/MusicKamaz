@@ -9,7 +9,7 @@ import ru.kamaz.music.view_models.MainListMusicViewModel
 import ru.kamaz.music.view_models.TrackViewModel
 import ru.kamaz.music.view_models.MusicFragmentViewModel
 import ru.kamaz.music.view_models.bt.BtFragmentViewModel
-import ru.kamaz.music.view_models.music_category.MusicCategoryViewModel
+import ru.kamaz.music.view_models.list.ListViewModel
 import ru.sir.presentation.annotations.ViewModelKey
 import ru.sir.presentation.factories.ViewModelFactory
 
@@ -37,10 +37,17 @@ abstract class ViewModelModel() {
     @IntoMap
     @ViewModelKey(BtFragmentViewModel::class)
     abstract fun bindBtViewModel(model: BtFragmentViewModel): ViewModel
-     @Binds
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ListViewModel::class)
+    abstract fun bindListViewModel(model: ListViewModel): ViewModel
+
+
+   /*  @Binds
     @IntoMap
     @ViewModelKey(MusicCategoryViewModel::class)
     abstract fun bindMusicCategoryViewModel(model: MusicCategoryViewModel): ViewModel
-
+*/
 
 }

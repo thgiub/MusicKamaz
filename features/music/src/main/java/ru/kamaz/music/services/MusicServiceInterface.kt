@@ -44,6 +44,8 @@ interface MusicServiceInterface{
         fun getRepeat(): StateFlow<Int>
         fun changeRepeatMode()
         fun isShuffleOn(): StateFlow<Boolean>
+        fun changeRv(): StateFlow<Int>
+        fun isChangeRv()
     }
 
     interface ViewModel{

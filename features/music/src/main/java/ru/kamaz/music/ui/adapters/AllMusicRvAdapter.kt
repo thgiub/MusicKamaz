@@ -1,15 +1,5 @@
 package ru.kamaz.music.ui.adapters
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import ru.kamaz.itis.phoneapp.ui.pojo.RecyclerViewItem
-
-import ru.kamaz.music.ui.music_сategory.MusicCategoryFragment
-import ru.kamaz.music_api.models.Track
-
 class AllMusicRvAdapter{/*(private val item: List<MusicCategoryFragment.DataModel>) :
     RecyclerView.Adapter<AllMusicRvAdapter.MyViewHolder>() {
 

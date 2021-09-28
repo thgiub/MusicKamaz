@@ -8,19 +8,16 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import ru.kamaz.music.R
-import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.CategoryLoadRV
 import ru.kamaz.music_api.interactor.FavoriteMusicRV
 import ru.kamaz.music_api.interactor.LoadData
-import ru.kamaz.music_api.interactor.QueryFavoriteMusic
 import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.Track
-import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
@@ -32,7 +29,7 @@ class MainListMusicViewModel @Inject constructor(
     private val categoryData: CategoryLoadRV,
     private val favoriteMusicData: FavoriteMusicRV
 
-) : BaseViewModel(application), ServiceConnection {
+) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
 
     companion object {
         private const val RV_ITEM = 2
@@ -40,8 +37,14 @@ class MainListMusicViewModel @Inject constructor(
         private const val RV_ITEM_MUSIC_FAVORITE = 4
     }
 
-    private var service: MusicServiceInterface.Service? = null
+   private var service: MusicServiceInterface.Service? = null
 
+
+
+    val howRvModeNow: StateFlow<Int> by lazy {
+        Log.i("item", "iiii")
+        service?.changeRv() ?: MutableStateFlow(0)
+    }
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
@@ -53,6 +56,8 @@ class MainListMusicViewModel @Inject constructor(
 
     private val _favorite= MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var favorite = _favorite.asStateFlow()
+
+
 
     override fun init() {
         _isLoading.value = true
@@ -71,7 +76,7 @@ class MainListMusicViewModel @Inject constructor(
         _huitems.value= category.toRecyclerViewItemsCategory()
     }
 
-    private fun onFavoriteLoaded(favorite: List<FavoriteSongs>){
+    private fun onFavoriteLoaded(favorite: List<Track>){
         _favorite.value= favorite.toRecyclerViewItemsFavorite()
     }
 
@@ -94,7 +99,7 @@ class MainListMusicViewModel @Inject constructor(
     }
 
 
-    private fun List<FavoriteSongs>.toRecyclerViewItemsFavorite(): List<RecyclerViewBaseDataModel> {
+    private fun List<Track>.toRecyclerViewItemsFavorite(): List<RecyclerViewBaseDataModel> {
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
         this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM_MUSIC_FAVORITE )) }
         return newList
@@ -108,5 +113,25 @@ class MainListMusicViewModel @Inject constructor(
 
     override fun onServiceDisconnected(name: ComponentName?) {
         service = null
+    }
+
+    override fun addListener() {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeListener() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCheckPosition(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onUpdateSeekBar(duration: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun selectBtMode() {
+        TODO("Not yet implemented")
     }
 }

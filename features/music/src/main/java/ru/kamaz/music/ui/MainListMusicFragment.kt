@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.producers.MusicCategoryViewHolder
+import ru.kamaz.music.ui.producers.MusicFavoriteViewHolder
 import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
 import ru.kamaz.music.view_models.MainListMusicViewModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
+import ru.sir.presentation.extensions.launchWhenStarted
 
 
 class MainListMusicFragment
@@ -21,14 +24,14 @@ class MainListMusicFragment
         app.getComponent<MusicComponent>().inject(this)
     }
 
-    private var holder = MusicCategoryEnum.LIST_ALL_MUSIC
+   // private var holder = MusicCategoryEnum.LIST_ALL_MUSIC
 
-    enum class MusicCategoryEnum( val category: Int){
+ /*   enum class MusicCategoryEnum( val category: Int){
         LIST_ALL_MUSIC(0),
         FOLDER_WITH_MUSIC(1),
         CATEGORY_MUSIC(2),
         FAVORITE_MUSIC(3)
-    }
+    }*/
     override fun initBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,31 +39,28 @@ class MainListMusicFragment
     ) = FragmentMainListMusicBinding.inflate(inflater, container, false)
 
     override fun initVars() {
-        startListAllMusic()
-       // updateRecyclerViewAdapter(holder)
-        //binding.rvAllMusic.adapter = recyclerViewAdapter()
+      //  startListAllMusic()
+
+        viewModel.howRvModeNow.launchWhenStarted(lifecycleScope){
+            Log.i("item", "$it click")
+           // rvChange(it)
+        }
     }
 
     override fun setListeners() {
         binding.sourceSelection.listMusic.setOnClickListener {
-         /*   this.holder =  MusicCategoryEnum.LIST_ALL_MUSIC
-            updateRecyclerViewAdapter(holder)*/
-            startListAllMusic()
+          //  startListAllMusic()
         }
         binding.sourceSelection.folderMusic.setOnClickListener {
-            this.holder=MusicCategoryEnum.FOLDER_WITH_MUSIC
-            //updateRecyclerViewAdapter(holder)
+            //this.holder=MusicCategoryEnum.FOLDER_WITH_MUSIC
         }
         binding.sourceSelection.categoryMusic.setOnClickListener {
-           /* this.holder=MusicCategoryEnum.CATEGORY_MUSIC
-            Log.i("startCategoryMusic", "startCategoryMusic")
-            updateRecyclerViewAdapter(holder)*/
-            startCategoryMusic()
+           // startCategoryMusic()
         }
         super.setListeners()
     }
 
-    fun onTrackClicked(track: Track) {
+/*    fun onTrackClicked(track: Track) {
         viewModel.onItemClick(track)
     }
 
@@ -73,6 +73,13 @@ class MainListMusicFragment
         }
     }
 
+    fun rvChange(rv: Int){
+        when(rv){
+            4-> startFavoriteMusic()
+        }
+
+    }
+
     private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
         .addProducer(MusicListViewHolderProducer())
         .build { it }
@@ -81,8 +88,8 @@ class MainListMusicFragment
         .addProducer(MusicCategoryViewHolder())
         .build { it }
 
-    private fun recyclerViewFavoriteMusicAdapter() = RecyclerViewAdapter.Builder(this, viewModel.huitems)
-        .addProducer(MusicCategoryViewHolder())
+    private fun recyclerViewFavoriteMusicAdapter() = RecyclerViewAdapter.Builder(this, viewModel.favorite)
+        .addProducer(MusicFavoriteViewHolder())
         .build { it }
 
     fun startFolderWithMusic(){
@@ -102,9 +109,10 @@ class MainListMusicFragment
     }
 
     fun startFavoriteMusic(){
+        Log.i("item", " click")
         this.holder=MusicCategoryEnum.FAVORITE_MUSIC
         binding.rvAllMusic.adapter = recyclerViewFavoriteMusicAdapter()
-    }
+    }*/
 }
 
 

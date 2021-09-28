@@ -117,11 +117,15 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private val _repeatHowNow = MutableStateFlow(0)
     val repeatHowNow = _repeatHowNow.asStateFlow()
+
     private val _data = MutableStateFlow("")
     val data = _data.asStateFlow()
 
     private val _isPlaying = MutableStateFlow<Boolean>(true)
     val isPlaying = _isPlaying.asStateFlow()
+
+    private val _rvChange = MutableStateFlow(0)
+    val rvChange = _rvChange.asStateFlow()
 
     private val _isBtModeOn = MutableStateFlow<Boolean>(false)
     val isBtModeOn = _isBtModeOn.asStateFlow()
@@ -782,7 +786,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
 
 
+
     override fun isShuffleOn(): StateFlow<Boolean> = isShuffleStatus
+    override fun changeRv():StateFlow<Int> =rvChange
+    override fun isChangeRv() {
+        _rvChange.value = 4
+    }
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isNotUSBConnected
