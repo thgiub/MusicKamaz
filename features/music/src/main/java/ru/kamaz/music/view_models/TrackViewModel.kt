@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import androidx.lifecycle.viewModelScope
+import android.widget.Toast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.services.MusicService
@@ -15,11 +15,8 @@ import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.LoadData
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.None
-
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
-import ru.sir.presentation.extensions.launchOn
-
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
@@ -40,20 +37,32 @@ class TrackViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var items = _items.asStateFlow()
 
+    private val _trackIsEmpty = MutableStateFlow(false)
+    val trackIsEmpty = _trackIsEmpty.asStateFlow()
+
 
     override fun init() {
         _isLoading.value = true
-        loadData(None()) { it.either({}, ::onDataLoaded) }
+        loadData(None()) { it.either({  }, ::onDataLoaded) }
 
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
 
     private fun onDataLoaded(data: List<Track>) {
+        if (data.isEmpty()) {
+            Log.d("mediaPlayer", "no")
+            _trackIsEmpty.value = true
+           // toast()
+        } else _trackIsEmpty.value = false
         _items.value = data.toRecyclerViewItems()
         _isLoading.value = false
 
     }
+
+   /* fun toast() {
+        Toast.makeText(context, "Не найдено аудиофайлов на устройсве", Toast.LENGTH_LONG).show()
+    }*/
 
     fun onItemClick(track: Track) {
         service?.intMediaPlayer()

@@ -1,8 +1,10 @@
-package ru.kamaz.music.ui
+package ru.kamaz.music.ui.all_musiclist
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import ru.kamaz.music.databinding.FragmentListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
@@ -11,6 +13,7 @@ import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
+import ru.sir.presentation.extensions.launchOn
 
 class TrackFragment :
     BaseFragment<TrackViewModel, FragmentListMusicBinding>(TrackViewModel::class.java ) {
@@ -31,6 +34,13 @@ class TrackFragment :
 
     }
 
+    override fun setListeners() {
+
+        viewModel.trackIsEmpty.launchOn(lifecycleScope){
+            musicListIsEmpty(it)
+        }
+        super.setListeners()
+    }
     fun onTrackClicked(track: Track) {
         viewModel.onItemClick(track)
     }
@@ -38,5 +48,11 @@ class TrackFragment :
     private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
         .addProducer(MusicListViewHolderProducer())
         .build { it }
+
+    private fun  musicListIsEmpty(isEmpty:Boolean){
+        if (isEmpty) binding.audioIsEmpty.visibility = View.VISIBLE
+        else binding.audioIsEmpty.visibility = View.GONE
+    }
+
 }
 

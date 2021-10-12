@@ -31,20 +31,6 @@
         app:layout_constraintVertical_weight="8"
         android:layout_height="0dp">
     </FrameLayout>
-<!--    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_all_music"
-        app:layout_constraintTop_toBottomOf="@+id/search"
-        app:layout_constraintBottom_toTopOf="@+id/source_selection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="match_parent"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="80dp"
-        app:layout_constraintVertical_weight="8"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:layout_height="0dp">
-    </androidx.recyclerview.widget.RecyclerView>-->
-
     <include
         android:id="@+id/source_selection"
         layout="@layout/category_buttons_group"

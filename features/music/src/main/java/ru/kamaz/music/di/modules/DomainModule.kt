@@ -10,6 +10,10 @@ class DomainModule {
 
     @Provides
     fun provideLoadData(repository: Repository): LoadData = LoadData(repository)
+    @Provides
+    fun provideArtistLoadRV(repository: Repository): ArtistLoadRV = ArtistLoadRV(repository)
+    @Provides
+    fun provideAllFolderWithMusic(repository: Repository): AllFolderWithMusicRV = AllFolderWithMusicRV(repository)
 
     @Provides
     fun provideCategoryLoadRV(repository: Repository): CategoryLoadRV = CategoryLoadRV(repository)

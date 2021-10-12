@@ -12,9 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music_api.interactor.AllFolderWithMusicRV
 import ru.kamaz.music_api.interactor.CategoryLoadRV
 import ru.kamaz.music_api.interactor.FavoriteMusicRV
 import ru.kamaz.music_api.interactor.LoadData
+import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.Track
@@ -27,14 +29,13 @@ class MainListMusicViewModel @Inject constructor(
     application: Application,
     private val loadData: LoadData,
     private val categoryData: CategoryLoadRV,
-    private val favoriteMusicData: FavoriteMusicRV
-
+    private val rvAllFolderWithMusic: AllFolderWithMusicRV
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
 
     companion object {
         private const val RV_ITEM = 2
         private const val RV_ITEM_MUSIC_CATEGORY = 3
-        private const val RV_ITEM_MUSIC_FAVORITE = 4
+        private const val RV_ITEM_MUSIC_FOLDER= 4
     }
 
    private var service: MusicServiceInterface.Service? = null
@@ -57,13 +58,16 @@ class MainListMusicViewModel @Inject constructor(
     private val _favorite= MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var favorite = _favorite.asStateFlow()
 
+    private val _folder= MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    var folder = _folder.asStateFlow()
+
 
 
     override fun init() {
         _isLoading.value = true
         loadData(None()) { it.either({}, ::onDataLoaded) }
         categoryData(None()) { it.either({}, ::onCategoryLoaded) }
-        favoriteMusicData
+        rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
@@ -76,8 +80,9 @@ class MainListMusicViewModel @Inject constructor(
         _huitems.value= category.toRecyclerViewItemsCategory()
     }
 
-    private fun onFavoriteLoaded(favorite: List<Track>){
-        _favorite.value= favorite.toRecyclerViewItemsFavorite()
+
+    private fun onAllFolderWithMusic(folderMusic: List<AllFolderWithMusic>){
+        _folder.value = folderMusic.toRecyclerViewItemsFolder()
     }
 
     fun onItemClick(track: Track) {
@@ -99,9 +104,9 @@ class MainListMusicViewModel @Inject constructor(
     }
 
 
-    private fun List<Track>.toRecyclerViewItemsFavorite(): List<RecyclerViewBaseDataModel> {
+    private fun List<AllFolderWithMusic>.toRecyclerViewItemsFolder(): List<RecyclerViewBaseDataModel> {
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
-        this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM_MUSIC_FAVORITE )) }
+        this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM_MUSIC_FOLDER )) }
         return newList
     }
 

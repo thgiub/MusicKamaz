@@ -5,11 +5,11 @@
 
     <fragment
         android:id="@+id/musicFragment"
-        android:name="ru.kamaz.music.ui.MusicFragment"
+        android:name="ru.kamaz.music.ui.one_song_fragment.MusicFragment"
         android:label="MusicFragment" />
     <fragment
         android:id="@+id/trackFragment"
-        android:name="ru.kamaz.music.ui.TrackFragment"
+        android:name="ru.kamaz.music.ui.all_musiclist.TrackFragment"
         android:label="TrackFragment" />
     <fragment
         android:id="@+id/btFragment"

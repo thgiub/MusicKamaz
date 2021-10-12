@@ -1,5 +1,6 @@
 package ru.kamaz.music.data
 
+import kotlinx.coroutines.flow.Flow
 import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music_api.Failure
@@ -14,6 +15,6 @@ interface MusicCache {
     fun deleteFavoriteSong(song: FavoriteSongsEntity): Either<Failure, None>
     fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None>
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
-    fun getAllFavoriteSongs(): Either<Failure, String>
+    fun getAllFavoriteSongs():  Flow<List<FavoriteSongs>>
     fun queryHistorySongs(): Either<Failure, String>
 }

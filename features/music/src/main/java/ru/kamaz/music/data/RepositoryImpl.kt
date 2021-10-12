@@ -10,26 +10,26 @@ import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.interfaces.Repository
-import ru.kamaz.music_api.models.CategoryMusicModel
-import ru.kamaz.music_api.models.FavoriteSongs
-import ru.kamaz.music_api.models.HistorySongs
+import ru.kamaz.music_api.models.*
 
-import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.None
 
 
 class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: MediaPlayer, private val testDBDao: MusicCache): Repository {
-    override fun loadData(): Either<None, List<Track>> = media.scanTracks()
+    override fun loadData(): Either<None, List<Track>> = media.scanTracks(0)
+    override fun rvArtist(): Either<None, List<Track>> = media.scanTracks(1)
+
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
-    override fun rvFavorite(): Either<Failure, String> =testDBDao.getAllFavoriteSongs()
+    override fun rvFavorite():  Flow<List<FavoriteSongs>> =testDBDao.getAllFavoriteSongs()
+    override fun rvAllFolderWithMusic(): Either<None, List<AllFolderWithMusic>> = media.getAllFolder()
 
     override fun getMusicCover(albumId: Long): Either<None, String> = media.getAlbumImagePath(albumId)
 
     override fun getMusicPositionFlow(): Flow<Int> = flow {
         while (true) {
             val currentPosition = mediaPlayer.currentPosition
-            Log.i("getMusicPositionFlow", "INSERT: $currentPosition")
+           // Log.i("getMusicPositionFlow", "INSERT: $currentPosition")
             emit(currentPosition)
             delay(1000)
         }
@@ -44,7 +44,7 @@ class RepositoryImpl(private val media: MediaManager, private val mediaPlayer: M
 
     override fun insertHistorySong(song: HistorySongs): Either<Failure, None> {
         val r = testDBDao.insertHistorySong(song.toDao())
-        Log.i("insertHistorySong", "INSERT: $r")
+      //  Log.i("insertHistorySong", "INSERT: $r")
         return r
     }
 

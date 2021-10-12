@@ -165,7 +165,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun updateTracks(mediaManager: MediaManager) {
-        val result = mediaManager.scanTracks()
+        val result = mediaManager.scanTracks(0)
         if (result is Either.Right) {
             tracks.addAll(result.r)
         }

@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui
+package ru.kamaz.music.ui.one_song_fragment
 
 import android.app.AlertDialog
 import android.content.ComponentName
@@ -74,7 +74,7 @@ class MusicFragment :
             changeSourceViewButtons()
         }
         binding.sourceSelection.btnBt.setOnClickListener {
-            Log.i("Test", "musicFragment")
+           // Log.i("Test", "musicFragment")
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
         }
         binding.sourceSelection.disk.setOnClickListener {
@@ -98,7 +98,7 @@ class MusicFragment :
 
         binding.seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                Log.i("SEEk", "bool $b int $i")
+                //Log.i("SEEk", "bool $b int $i")
                 if (b) {
                     viewModel.checkPosition(i)
                 }
@@ -136,7 +136,7 @@ class MusicFragment :
     private fun initServiceVars() {
         viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
-            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_white)
+            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {
@@ -162,7 +162,7 @@ class MusicFragment :
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
-            Log.i("duration", "$it ")
+          //  Log.i("duration", "$it ")
             val currentPosition = if (it < 0) 0 else it
             binding.seek.progress = currentPosition
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
@@ -171,11 +171,11 @@ class MusicFragment :
         viewModel.test.launchWhenStarted(lifecycleScope) {
             if (it) {
                 btModeActivation()
-                Log.i("test", "frag ")
+                //Log.i("test", "frag ")
             } else {
                 viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
                 btModeActivation()
-                Log.i("test", "frag2 ")
+               // Log.i("test", "frag2 ")
 
             }
 
@@ -183,10 +183,10 @@ class MusicFragment :
 
         viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
             if (it) {
-                Log.i("bt_frag_isNotConnected", "bt on")
+                //Log.i("bt_frag_isNotConnected", "bt on")
                 diskModeActivation()
             } else {
-                Log.i("bt_frag_isNotConnected", "bt off")
+               // Log.i("bt_frag_isNotConnected", "bt off")
                 viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
                 btModeActivation()
             }
@@ -224,7 +224,7 @@ class MusicFragment :
     }
 
     private fun updateTrackCover(coverPath: String) {
-        Log.i("diaz", "IMG + $coverPath ")
+      //  Log.i("diaz", "IMG + $coverPath ")
 
         if (coverPath.isEmpty()) {
             /* Picasso.with(context)
@@ -277,7 +277,7 @@ class MusicFragment :
     }
 
     private fun likeStatus(like:Boolean){
-        Log.i("isFavorite", "isFavorite")
+      //  Log.i("isFavorite", "isFavorite")
         if (like){
             binding.controlPanel.like.setImageResource(R.drawable.ic_like_true)
         }else{

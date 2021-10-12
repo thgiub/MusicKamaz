@@ -5,45 +5,17 @@
     android:background="#121212"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-   <!-- <androidx.appcompat.widget.SearchView
-        android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/rv_all_music"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="80dp"
-        >
-    </androidx.appcompat.widget.SearchView>
 
-    <FrameLayout
-        android:id="@+id/fragment"
-        app:layout_constraintTop_toBottomOf="@+id/search"
-        app:layout_constraintBottom_toTopOf="@+id/source_selection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="match_parent"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="80dp"
-        app:layout_constraintVertical_weight="8"
-        android:layout_height="0dp">
-    </FrameLayout>
 
-    <include
-        android:id="@+id/source_selection"
-        layout="@layout/category_buttons_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintVertical_weight="1"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="80dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rv_all_music"
-        />
--->
+   <androidx.recyclerview.widget.RecyclerView
+       android:id="@+id/folder_with_music_rv"
+       app:layout_constraintTop_toTopOf="parent"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       android:layout_width="match_parent"
+       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+       android:layout_height="0dp">
+   </androidx.recyclerview.widget.RecyclerView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

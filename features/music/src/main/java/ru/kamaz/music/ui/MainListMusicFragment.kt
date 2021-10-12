@@ -5,16 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
-import ru.kamaz.music.ui.producers.MusicCategoryViewHolder
-import ru.kamaz.music.ui.producers.MusicFavoriteViewHolder
-import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
+import ru.kamaz.music.ui.all_musiclist.TrackFragment
+import ru.kamaz.music.ui.category.CategoryFragment
 import ru.kamaz.music.view_models.MainListMusicViewModel
-import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
-import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 import ru.sir.presentation.extensions.launchWhenStarted
 
 
@@ -39,8 +37,7 @@ class MainListMusicFragment
     ) = FragmentMainListMusicBinding.inflate(inflater, container, false)
 
     override fun initVars() {
-      //  startListAllMusic()
-
+        startListAllMusic()
         viewModel.howRvModeNow.launchWhenStarted(lifecycleScope){
             Log.i("item", "$it click")
            // rvChange(it)
@@ -49,15 +46,29 @@ class MainListMusicFragment
 
     override fun setListeners() {
         binding.sourceSelection.listMusic.setOnClickListener {
-          //  startListAllMusic()
+           startListAllMusic()
         }
         binding.sourceSelection.folderMusic.setOnClickListener {
-            //this.holder=MusicCategoryEnum.FOLDER_WITH_MUSIC
+            startFolderListFragment()
         }
         binding.sourceSelection.categoryMusic.setOnClickListener {
-           // startCategoryMusic()
+           startCategoryMusic()
         }
         super.setListeners()
+    }
+
+    private fun startCategoryMusic(){
+        parentFragmentManager.beginTransaction().replace(R.id.fragment, CategoryFragment()).commit()
+        //parentFragmentManager.beginTransaction().add(R.id.fragment, CategoryFragment()).commit()
+    }
+
+    private fun  startListAllMusic(){
+        parentFragmentManager.beginTransaction().replace(R.id.fragment, TrackFragment()).commit()
+        binding.sourceSelection.listMusic.background
+    }
+
+    private fun startFolderListFragment(){
+        parentFragmentManager.beginTransaction().replace(R.id.fragment, FolderFragment()).commit()
     }
 
 /*    fun onTrackClicked(track: Track) {

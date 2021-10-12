@@ -20,5 +20,18 @@
             android:layout_height="0dp">
         </androidx.recyclerview.widget.RecyclerView>
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/audioIsEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Не удалось обнаружить аудифайлы на данном устройстве"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 

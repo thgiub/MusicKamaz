@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.databinding.ImageTextItemBinding
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music.ui.category.CategoryFragment
 import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
@@ -33,8 +34,7 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, ImageText
             binding.customTxt.text = it
         }
         binding.customLin.setOnClickListener {
-            Log.i("item", "$it click")
-            service.value?.isChangeRv()
+            data?.let { (parent as CategoryFragment).clickListener(it.id) }
         }
 
     }
@@ -43,6 +43,7 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, ImageText
         this.data = data
         img.value= data.img
         category.value= data.category
+
     }
 
     override fun addListener() {

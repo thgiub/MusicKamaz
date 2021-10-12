@@ -1,6 +1,7 @@
 package ru.kamaz.music.cache.db.dao
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import ru.kamaz.music.domain.FavoriteSongsEntity
 
 @Dao
@@ -16,6 +17,6 @@ interface LikeMusicDao {
     fun loadAll(data:String): FavoriteSongsEntity
 
     @Query("SELECT * FROM like_songs ")
-    fun getData(): FavoriteSongsEntity
+      fun getData(): Flow<List<FavoriteSongsEntity>>
 
 }

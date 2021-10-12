@@ -4,31 +4,33 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.databinding.TestTextItemBinding
 import ru.kamaz.music.ui.MainListMusicFragment
+import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 
-class ItemFavoriteViewModel : RecyclerViewBaseItem<Track, TestTextItemBinding>(){
-    private val artist = MutableStateFlow("")
-    private val title = MutableStateFlow("")
-    private lateinit var data: Track
-
-    override fun bindData(data: Track) {
-        this.data = data
-        artist.value= data.artist
-        title.value= data.title
-    }
+class ItemFavoriteViewModel : RecyclerViewBaseItem<FavoriteSongs, TestTextItemBinding>(){
+    private val id = MutableStateFlow(0)
+    private val dataMusic = MutableStateFlow("")
+    private lateinit var data: FavoriteSongs
 
     override fun initVars() {
-        artist.launchWhenStarted(parent.lifecycleScope){
-            binding.artistName.text=it
+        id.launchWhenStarted(parent.lifecycleScope){
+            binding.artistName.text= it.toString()
         }
-        title.launchWhenStarted(parent.lifecycleScope){
+        dataMusic.launchWhenStarted(parent.lifecycleScope){
             binding.musicName.text=it
         }
 
         binding.root.setOnClickListener {
-          //  (parent as MainListMusicFragment).onTrackClicked(data)
+
         }
+    }
+
+    override fun bindData(data: FavoriteSongs) {
+        this.data = data
+        id.value = data.idSong
+        dataMusic.value = data.data
+
     }
 }
