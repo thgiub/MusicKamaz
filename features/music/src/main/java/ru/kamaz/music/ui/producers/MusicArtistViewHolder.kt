@@ -12,6 +12,4 @@ class MusicArtistViewHolder : ViewHolderProducer<Track, ItemArtist, FolderItemRv
     RV_ITEM_MUSIC_ARTIST, Track::class.java, ItemArtist::class.java
 ) {
     override fun initBinding(inflater: LayoutInflater, parent: ViewGroup) =FolderItemRvBinding.inflate(inflater, parent, false)
-
-
 }

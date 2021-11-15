@@ -20,7 +20,7 @@ interface MusicServiceInterface{
         fun isPlaying(): Boolean
         fun checkPosition(position: Int)
         fun previousTrack()
-        fun nextTrack()/* fun updateMusic(track: Track)*/
+        fun nextTrack(auto:Int)/* fun updateMusic(track: Track)*/
         fun updateTracks(mediaManager: MediaManager)
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
@@ -46,6 +46,7 @@ interface MusicServiceInterface{
         fun isShuffleOn(): StateFlow<Boolean>
         fun changeRv(): StateFlow<Int>
         fun isChangeRv()
+        fun initTrack(track: Track, data1: String)
     }
 
     interface ViewModel{

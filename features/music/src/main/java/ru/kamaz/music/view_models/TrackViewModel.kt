@@ -67,6 +67,7 @@ class TrackViewModel @Inject constructor(
     fun onItemClick(track: Track) {
         service?.intMediaPlayer()
         service?.testPlay(track)
+        Log.i("onTrackClicked", "onTrackClicked")
     }
 
     private fun List<Track>.toRecyclerViewItems(): List<RecyclerViewBaseDataModel> {

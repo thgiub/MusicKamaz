@@ -1,5 +1,11 @@
 package ru.kamaz.musickamaz.ui
 
+import android.app.AlertDialog
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.EditText
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
 import ru.kamaz.music.ui.NavAction
@@ -26,6 +32,8 @@ class MainActivity : BaseActivity() {
     override fun onActivityCreated() {
         checkPermission()
     }
+
+
 
     private fun checkPermission() {
         when(PermissionUtils.isPermissionsGranted(this)) {

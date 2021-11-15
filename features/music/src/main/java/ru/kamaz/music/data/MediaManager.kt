@@ -1,8 +1,10 @@
 package ru.kamaz.music.data
 
+import ru.kamaz.music_api.SourceType
 import ru.kamaz.music_api.models.*
 import ru.sir.core.Either
 import ru.sir.core.None
+import java.io.File
 
 interface MediaManager {
     fun scanTracks(type:Int): Either<None, List<Track>>
@@ -10,6 +12,7 @@ interface MediaManager {
     fun getAlbumImagePath(albumID: Long): Either<None, String>
     fun getCategory():Either<None, List<CategoryMusicModel>>
     fun getAllFolder(): Either<None, List<AllFolderWithMusic>>
+    fun scanMediaFiles(sourceType: SourceType): List<File>
    // fun getFolderWithMusic():Either<None, List<FolderMusicModel>>
 
 }

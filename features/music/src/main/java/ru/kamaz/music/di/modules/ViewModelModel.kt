@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import ru.kamaz.music.view_models.DialogViewModel
 import ru.kamaz.music.view_models.MainListMusicViewModel
 import ru.kamaz.music.view_models.TrackViewModel
 import ru.kamaz.music.view_models.MusicFragmentViewModel
@@ -49,10 +50,16 @@ abstract class ViewModelModel() {
     @ViewModelKey(CategoryViewModel::class)
     abstract fun bindCategoryViewModel(model: CategoryViewModel): ViewModel
 
-   /*  @Binds
+    @Binds
     @IntoMap
-    @ViewModelKey(MusicCategoryViewModel::class)
-    abstract fun bindMusicCategoryViewModel(model: MusicCategoryViewModel): ViewModel
-*/
+    @ViewModelKey(DialogViewModel::class)
+    abstract fun bindDialogViewModel(model: DialogViewModel): ViewModel
+
+
+    /*  @Binds
+     @IntoMap
+     @ViewModelKey(MusicCategoryViewModel::class)
+     abstract fun bindMusicCategoryViewModel(model: MusicCategoryViewModel): ViewModel
+ */
 
 }

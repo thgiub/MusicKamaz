@@ -51,7 +51,6 @@
         <item name="android:padding">@dimen/control_btn_padding</item>
         <item name="android:background">@drawable/ic_btn_background</item>
     </style>
-
     <style name="Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>

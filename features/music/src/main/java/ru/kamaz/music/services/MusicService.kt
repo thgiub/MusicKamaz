@@ -46,7 +46,7 @@ import ru.sir.presentation.extensions.launchOn
 import javax.inject.Inject
 
 
-class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
+class  MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
     MusicManagerListener, BluetoothManagerListener {
 
     @Inject
@@ -123,8 +123,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _data = MutableStateFlow("")
     val data = _data.asStateFlow()
 
-    private val _isPlaying = MutableStateFlow<Boolean>(true)
+    private val _isPlaying = MutableStateFlow<Boolean>(false)
     val isPlaying = _isPlaying.asStateFlow()
+
+    private val _buttonStateSaved = MutableStateFlow<Boolean>(false)
+    val buttonStateSaved = _buttonStateSaved.asStateFlow()
 
     private val _rvChange = MutableStateFlow(0)
     val rvChange = _rvChange.asStateFlow()
@@ -221,7 +224,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         }
         compilationMusic()
-        queryLastMusic()
+       // queryLastMusic()
     }
 
     override fun onDestroy() {
@@ -291,7 +294,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun setViewModel(viewModel: MusicServiceInterface.ViewModel) {
         this.myViewModel = viewModel
     }
-
 
     enum class SourceEnum(val value: Int) {
         BT(0),
@@ -363,7 +365,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         //  twManagerMusic.removeListener(this)
     }
 
-    private fun initTrack(track: Track, data1: String) {
+    override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
         updateTracks(mediaManager)
@@ -381,7 +383,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         queryFavoriteMusic()
     }
 
-    fun stopMediaPlayer() {
+    private fun stopMediaPlayer() {
         mediaPlayer.stop()
     }
 
@@ -391,7 +393,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         val albumID: Long = currentTrack.albumId
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
-
+        Log.i("onTrackClicked ", "testPley")
         getMusicImg(albumID)
         mediaPlayer.apply {
             stop()
@@ -444,6 +446,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         return isPlaying()
     }
 
+
     private fun updateMusicName(title: String, artist: String, duration: String) {
         _title.value = title
         _artist.value = artist
@@ -474,6 +477,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun isPlaying(): Boolean = mediaPlayer.isPlaying
+
 
     override fun checkPosition(position: Int) {
         mediaPlayer.seekTo(position)
@@ -522,7 +526,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     fun compilationMusic() {
-        mediaPlayer.setOnCompletionListener(OnCompletionListener { nextTrack() })
+        mediaPlayer.setOnCompletionListener(OnCompletionListener {
+            Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
+            nextTrack(1)
+        })
     }
 
     fun initMediaPlayer() {
@@ -534,50 +541,20 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
-    override fun nextTrack() {
+    override fun nextTrack(auto: Int) {
         when (mode) {
             SourceEnum.DISK -> {
-                when(repeatMode) {
-                    RepeatMusicEnum.REPEAT_OFF->{
-                        if (tracks.isEmpty()) {
-
-                        } else {
-                            when (currentTrackPosition - 1) {
-                                -1 -> currentTrackPosition = tracks.size - 1
-                                else -> currentTrackPosition--
-                            }
-                            when (isPlaying()) {
-                                true -> {
-                                    initTrack(
-                                        tracks[currentTrackPosition],
-                                        tracks[currentTrackPosition].data
-                                    )
-                                    mediaPlayer.start()
-                                }
-                                false -> initTrack(
-                                    tracks[currentTrackPosition],
-                                    tracks[currentTrackPosition].data
-                                )
-                            }
-                        }
+                when (repeatMode) {
+                    RepeatMusicEnum.REPEAT_OFF -> {
+                        funRepeatOff(0)
                     }
-                    RepeatMusicEnum.REPEAT_ONE_SONG->{
-                        when (isPlaying()) {
-                            true -> {
-                                initTrack(
-                                    tracks[currentTrackPosition],
-                                    tracks[currentTrackPosition].data
-                                )
-                                mediaPlayer.start()
-                            }
-                            false -> initTrack(
-                                tracks[currentTrackPosition],
-                                tracks[currentTrackPosition].data
-                            )
-                        }
+                    RepeatMusicEnum.REPEAT_ONE_SONG -> {
+                        if(auto==0){
+                            funRepeatOff(0)
+                        }else funPlayOneSong(1)
                     }
-                    RepeatMusicEnum.REPEAT_ALL->{
-
+                    RepeatMusicEnum.REPEAT_ALL -> {
+                        funRepeatAll()
                     }
 
                 }
@@ -591,6 +568,54 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
             SourceEnum.USB -> {
 
+            }
+        }
+    }
+
+    fun funRepeatAll(){
+
+    }
+
+    fun funRepeatOff(mode: Int) {
+        if (tracks.isEmpty()) {
+        } else {
+            when (currentTrackPosition - 1) {
+                -1 -> currentTrackPosition = tracks.size - 1
+                else -> currentTrackPosition--
+            }
+          funPlayOneSong(mode)
+        }
+    }
+
+    fun funPlayOneSong(mode: Int) {
+
+        when(mode){
+            0->{
+                when (isPlaying.value) {
+                    true -> {
+                        initTrack(
+                            tracks[currentTrackPosition],
+                            tracks[currentTrackPosition].data
+                        )
+                        mediaPlayer.start()
+                        Log.i("isPlayingWhenPlay", "true${isPlaying.value}")
+                    }
+                    false -> {
+                        initTrack(
+                            tracks[currentTrackPosition],
+                            tracks[currentTrackPosition].data
+                        )
+                        Log.i("isPlayingWhenStop", "false${isPlaying.value}")
+                    }
+                }
+            }
+            1->{
+                initTrack(
+                    tracks[currentTrackPosition],
+                    tracks[currentTrackPosition].data
+                )
+                mediaPlayer.start()
+                Log.i("isPlayingAutoMode", "true${isPlaying.value}")
             }
         }
     }
@@ -624,7 +649,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         if (intent != null) {
             when (intent.action) {
                 ACTION_TOGGLE_PAUSE -> playOrPause()
-                ACTION_NEXT -> nextTrack()
+                ACTION_NEXT -> nextTrack(0)
                 ACTION_PREV -> previousTrack()
             }
         }
@@ -649,6 +674,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             .build()
         startForeground(101, notification)
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(channelId: String, channelName: String): String {

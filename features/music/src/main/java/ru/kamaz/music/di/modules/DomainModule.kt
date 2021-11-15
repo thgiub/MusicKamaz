@@ -34,6 +34,9 @@ class DomainModule {
     fun provideQueryFavoriteMusic(repository: Repository): QueryFavoriteMusic = QueryFavoriteMusic(repository)
    @Provides
     fun provideFavoriteMusicRV(repository: Repository): FavoriteMusicRV = FavoriteMusicRV(repository)
+
+    @Provides
+    fun providePlayListRV(repository: Repository): PlayListRV = PlayListRV(repository)
     @Provides
     fun provideDeleteFavoriteMusic(repository: Repository): DeleteFavoriteMusic = DeleteFavoriteMusic(repository)
 }

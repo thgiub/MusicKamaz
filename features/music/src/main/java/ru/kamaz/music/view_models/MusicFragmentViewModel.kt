@@ -25,7 +25,6 @@ import javax.inject.Inject
 
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
-    private val mediaPlayer: MediaPlayer,
     private val mediaManager: MediaManager,
     private val getMusicPosition: GetMusicPosition
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
@@ -33,7 +32,7 @@ class MusicFragmentViewModel @Inject constructor(
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
 
-    private val _isPlaying = MutableStateFlow(mediaPlayer.isPlaying)
+    private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
     private val _btModeActivation = MutableStateFlow(false)
     val btModeActivation = _btModeActivation.asStateFlow()
@@ -110,13 +109,6 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun init() {
-        val audioAttributes: AudioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            .build()
-        mediaPlayer.setOnCompletionListener(this)
-        mediaPlayer.setAudioAttributes(audioAttributes)
-
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
@@ -141,7 +133,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun playOrPause() {
-        _isPlaying.value = service.value?.playOrPause() ?: false
+        _isPlaying.value = service.value?.playOrPause()?: false
     }
 
     fun checkPosition(position: Int) {
@@ -161,7 +153,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun nextTrack() {
-        service.value?.nextTrack()
+        service.value?.nextTrack(0)
     }
 
     fun updateTracks(mediaManager: MediaManager) {
