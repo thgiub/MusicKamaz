@@ -34,6 +34,7 @@ interface MusicServiceInterface{
         fun btModeOn():StateFlow<Boolean>
         fun diskModeOn():StateFlow<Boolean>
         fun usbModeOn():StateFlow<Boolean>
+        fun usbConnect():StateFlow<Boolean>
         fun dialogFragment():StateFlow<Boolean>
         fun musicEmpty():StateFlow<Boolean>
         fun isFavoriteMusic():StateFlow<Boolean>

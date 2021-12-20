@@ -164,11 +164,12 @@ class AppMediaManager  @Inject constructor(val context: Context)
         val array = ArrayList<CategoryMusicModel>()
 
         val category = listOf(
-            CategoryMusicModel(R.drawable.ic_like_false, "Избранное",0),
-            CategoryMusicModel(R.drawable.ic_like_false, "Исполнители",1),
-            CategoryMusicModel(R.drawable.ic_like_false, "Жанры",2),
-            CategoryMusicModel(R.drawable.ic_like_false, "Альбомы",3),
-            CategoryMusicModel(R.drawable.ic_like_false, "Плейлисты",4),
+            CategoryMusicModel(R.drawable.ic_plus, "Создать",0),
+            CategoryMusicModel(R.drawable.ic_songers, "Исполнители",2),
+            CategoryMusicModel(R.drawable.ic_guitar, "Жанры",3),
+            CategoryMusicModel(R.drawable.ic_albom, "Альбомы",4),
+            CategoryMusicModel(R.drawable.ic_play_list, "Плейлисты",5),
+                    CategoryMusicModel(R.drawable.ic_like_for_list, "Избранное",1)
         )
         array.addAll(category)
         return Either.Right(array)
@@ -193,19 +194,17 @@ class AppMediaManager  @Inject constructor(val context: Context)
 
         if(cursor != null) {
 
-           /* cursor?.let {
+            cursor?.let {
+
                 it.moveToFirst()
                 val pathIndex = it.getColumnIndex(MediaStore.Images.Media.DATA)
-
                 do {
                     val path = it.getString(pathIndex)
                     val file = File(path)
                     if (!file.exists()) {
                         continue
                     }
-
                     val fileDir = file.getParent()
-
                     var songURL = it.getString(it.getColumnIndex(MediaStore.Audio.Media.DATA))
                     var songAuth = it.getString(it.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                     var songName = it.getString(it.getColumnIndex(MediaStore.Audio.Media.TITLE))
@@ -234,7 +233,7 @@ class AppMediaManager  @Inject constructor(val context: Context)
 
                     result.add(dirInfo)
                 }
-            }*/
+            }
         }
 
 

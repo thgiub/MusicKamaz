@@ -1,4 +1,8 @@
- <androidx.constraintlayout.widget.ConstraintLayout
+
+
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/view_change_source"
     android:orientation="horizontal"
     android:layout_marginTop="@dimen/marginTop"
@@ -58,7 +62,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
-        android:text="USB2"
+        android:text="USB"
         android:gravity="center"
         android:textColor="@color/white"
          />

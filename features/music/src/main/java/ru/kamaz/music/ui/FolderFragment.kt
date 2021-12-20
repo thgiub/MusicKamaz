@@ -46,7 +46,7 @@ class FolderFragment:BaseFragment<ListViewModel, FragmentListBinding>(ListViewMo
         .build { it }
 
     override fun initVars() {
-        binding.folderWithMusicRv.layoutManager = GridLayoutManager(context, 4)
+        binding.folderWithMusicRv.layoutManager = GridLayoutManager(context, 5)
         binding.folderWithMusicRv.adapter = recyclerViewAdapter()
     }
 

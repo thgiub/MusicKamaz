@@ -1,8 +1,7 @@
 package ru.kamaz.music.ui.one_song_fragment
 
-import android.app.AlertDialog
+import android.app.Activity
 import android.content.ComponentName
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,13 +10,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.core.os.bundleOf
+import androidx.core.view.marginStart
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.domain.GlobalConstants
 import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
+import ru.kamaz.music.ui.enums.PlayListFlow
 import ru.kamaz.music.view_models.MusicFragmentViewModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
@@ -61,20 +65,23 @@ class MusicFragment :
                 viewModel.playOrPause()
             }
         binding.controlPanel.rotate.setOnClickListener {
-            viewModel.startTrack()
             viewModel.shuffleStatusChange()
         }
         binding.prev.setOnClickListener {
             viewModel.previousTrack()
         }
         binding.openListFragment.setOnClickListener {
-            navigator.navigateTo(UiAction(OPEN_TRACK_LIST_FRAGMENT))
+            navigator.navigateTo(
+                UiAction(
+                    OPEN_TRACK_LIST_FRAGMENT,
+                    bundleOf(GlobalConstants.MAIN to PlayListFlow.MAIN_WINDOW)
+                )
+            )
         }
         binding.folder.setOnClickListener {
             changeSourceViewButtons()
         }
         binding.sourceSelection.btnBt.setOnClickListener {
-           // Log.i("Test", "musicFragment")
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
         }
         binding.sourceSelection.disk.setOnClickListener {
@@ -86,19 +93,25 @@ class MusicFragment :
 
         binding.sourceSelection.usb.setOnClickListener {
             viewModel.vmSourceSelection(MusicService.SourceEnum.USB)
-            usbModeActivation()
         }
         binding.controlPanel.like.setOnClickListener {
             viewModel.isSaveFavoriteMusic()
         }
         binding.controlPanel.repeat.setOnClickListener {
-             viewModel.repeatChange()
+            viewModel.repeatChange()
+        }
+        binding.controlPanel.addToFolder.setOnClickListener {
+            navigator.navigateTo(
+                UiAction(
+                    OPEN_TRACK_LIST_FRAGMENT,
+                    bundleOf(GlobalConstants.MAIN to PlayListFlow.SECOND_WINDOW)
+                )
+            )
         }
 
 
         binding.seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                //Log.i("SEEk", "bool $b int $i")
                 if (b) {
                     viewModel.checkPosition(i)
                 }
@@ -113,7 +126,21 @@ class MusicFragment :
         super.setListeners()
     }
 
-    fun changeSourceViewButtons(){
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            228 -> if (resultCode == Activity.RESULT_OK) {
+                data?.data?.let {
+                    Log.i("onActivityResult", "onActivityResult: $it")
+                }
+            }
+            else -> if (resultCode == Activity.RESULT_OK) {
+                println("OK")
+            }
+        }
+    }
+
+    fun changeSourceViewButtons() {
         changeSource(binding.controlPanel.viewPlayPause)
         changeSource(binding.sourceSelection.viewChangeSource)
     }
@@ -136,7 +163,8 @@ class MusicFragment :
     private fun initServiceVars() {
         viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
-            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_center)
+
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {
@@ -157,12 +185,12 @@ class MusicFragment :
             binding.seek.max = it
         }
 
-        viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope){
-          repeatIconChange(it)
+        viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope) {
+            repeatIconChange(it)
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
-          //  Log.i("duration", "$it ")
+
             val currentPosition = if (it < 0) 0 else it
             binding.seek.progress = currentPosition
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
@@ -171,11 +199,10 @@ class MusicFragment :
         viewModel.test.launchWhenStarted(lifecycleScope) {
             if (it) {
                 btModeActivation()
-                //Log.i("test", "frag ")
+
             } else {
                 viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
                 btModeActivation()
-               // Log.i("test", "frag2 ")
 
             }
 
@@ -183,16 +210,14 @@ class MusicFragment :
 
         viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
             if (it) {
-                //Log.i("bt_frag_isNotConnected", "bt on")
                 diskModeActivation()
             } else {
-               // Log.i("bt_frag_isNotConnected", "bt off")
                 viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
                 btModeActivation()
             }
         }
 
-        viewModel.isShuffleOn.launchWhenStarted(lifecycleScope){
+        viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
         }
 
@@ -204,27 +229,27 @@ class MusicFragment :
             }
         }
 
-        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope){
-          likeStatus(it)
+        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
+            likeStatus(it)
         }
 
-        viewModel.isBtModeOn.launchWhenStarted(lifecycleScope){
+        viewModel.isBtModeOn.launchWhenStarted(lifecycleScope) {
             if (it) btModeActivation()
         }
-        viewModel.isDiskModeOn.launchWhenStarted(lifecycleScope){
+        viewModel.isDiskModeOn.launchWhenStarted(lifecycleScope) {
             if (it) diskModeActivation()
         }
-        viewModel.isUsbModeOn.launchWhenStarted(lifecycleScope){
-            if (it) diskModeActivation()
+        viewModel.isUsbModeOn.launchWhenStarted(lifecycleScope) {
+            if (it) usbModeActivation()
         }
 
-        viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope){
+        viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
             if (it) dialog()
         }
     }
 
     private fun updateTrackCover(coverPath: String) {
-      //  Log.i("diaz", "IMG + $coverPath ")
+        //  Log.i("diaz", "IMG + $coverPath ")
 
         if (coverPath.isEmpty()) {
             /* Picasso.with(context)
@@ -233,54 +258,50 @@ class MusicFragment :
         } else {
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath)))
-                .into(binding.picture)
+                .into(binding.pictureDevice)
         }
     }
 
-    private fun dialog(){
-        AlertDialog.Builder(context)
-            .setTitle("Нет подключения по Bt")
-            .setMessage("Перейдти в настройки для подключения устройства по BT")
-            .setPositiveButton(android.R.string.yes,
-                DialogInterface.OnClickListener { dialog, which ->
-                    openBluetoothSettings()
-                })
-            .setNegativeButton(android.R.string.no, null)
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .show()
+
+    private fun dialog() {
+
+
+        navigator.navigateTo(
+            UiAction(
+                OPEN_DIALOG_BT_FRAGMENT
+            )
+        )
+        /*  AlertDialog.Builder(context)
+              .setTitle("Подключите телефон в ")
+              .setMessage("Перейдти в настройки?")
+              .setPositiveButton(R.string.settings,
+                  DialogInterface.OnClickListener { dialog, which ->
+                      openBluetoothSettings()
+                  })
+              .setNegativeButton(R.string.close, null)
+              .setIcon(android.R.drawable.ic_dialog_alert)
+              .show()*/
     }
 
-    private fun openBluetoothSettings() {
-        val intent = Intent(Intent.ACTION_MAIN, null)
-        val componentName = ComponentName("ru.sir.settings", "ru.sir.settings.ui.MainActivity")
 
-        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        intent.component = componentName
-        intent.putExtra("BluetoothSettings", true)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-
-        startActivity(intent)
-    }
-
-    private fun repeatIconChange(repeat:Int){
-        when(repeat){
-            0->binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
-            1->binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_one)
-            2->binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_all)
+    private fun repeatIconChange(repeat: Int) {
+        when (repeat) {
+            0 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
+            1 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_one)
+            2 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_all)
         }
 
     }
 
-    private fun randomSongStatus(random: Boolean){
-        if(random) binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_blue)
+    private fun randomSongStatus(random: Boolean) {
+        if (random) binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_blue)
         else binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_white)
     }
 
-    private fun likeStatus(like:Boolean){
-      //  Log.i("isFavorite", "isFavorite")
-        if (like){
+    private fun likeStatus(like: Boolean) {
+        if (like) {
             binding.controlPanel.like.setImageResource(R.drawable.ic_like_true)
-        }else{
+        } else {
             binding.controlPanel.like.setImageResource(R.drawable.ic_like_false)
         }
     }
@@ -306,7 +327,7 @@ class MusicFragment :
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.setBackgroundResource(R.drawable.bluetooth_back)
+        binding.pictureDevice.setBackgroundResource(R.drawable.bluetooth_back)
         binding.textUsb.visibility = View.INVISIBLE
 
     }
@@ -332,7 +353,7 @@ class MusicFragment :
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
         binding.picture.visibility = View.INVISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
-        binding.pictureDevice.setBackgroundResource(R.drawable.albom)
+        binding.pictureDevice.setBackgroundResource(R.drawable.music_png_bg)
         binding.textUsb.visibility = View.INVISIBLE
     }
 
@@ -377,13 +398,13 @@ class MusicFragment :
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
         binding.textUsb.visibility = View.VISIBLE
-        binding.picture.visibility = View.VISIBLE
-        binding.pictureDevice.visibility = View.INVISIBLE
+        binding.pictureDevice.visibility = View.VISIBLE
+        binding.picture.visibility = View.INVISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-        binding.picture.setBackgroundResource(R.drawable.albom)
+        binding.pictureDevice.setBackgroundResource(R.drawable.music_png_bg)
         binding.sourceSelection
     }
 

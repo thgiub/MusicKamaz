@@ -3,11 +3,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="20dp"
-    android:background="@drawable/back_item"
+    android:layout_marginTop= "@dimen/marginTop"
+    android:background="@drawable/ic_back_item"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
     android:padding="20dp">
 
 
@@ -37,6 +39,7 @@
         app:layout_constraintBottom_toTopOf="@+id/artist_name"
         app:layout_constraintEnd_toStartOf="@+id/like"
         app:layout_constraintHorizontal_weight="3"
+        android:textColor="@color/white"
         app:layout_constraintStart_toEndOf="@+id/micro_picture"
         app:layout_constraintTop_toTopOf="@+id/micro_picture"
         android:layout_marginStart="20dp"/>
@@ -46,6 +49,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:autoSizeTextType="uniform"
+        android:textColor="@color/text_item_grey"
         app:layout_constraintBottom_toBottomOf="@+id/micro_picture"
         app:layout_constraintStart_toStartOf="@id/music_name"
         app:layout_constraintTop_toBottomOf="@+id/music_name"

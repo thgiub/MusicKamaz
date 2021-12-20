@@ -2,35 +2,67 @@ package ru.kamaz.music.ui.dialog_windows
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.ComponentName
 import android.content.DialogInterface
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import ru.kamaz.music.R
+import ru.kamaz.music.databinding.BtDialogFragmentBinding
 
 
-class DialogBtSettings: DialogFragment() {
+class DialogBtSettings : DialogFragment() {
+
+    private var _binding: BtDialogFragmentBinding? = null
+
+    private val binding get() = _binding!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val title = "Выбор есть всегда"
-        val message = "Выбери пищу"
-        val button1String = "Вкусная пища"
-        val button2String = "Здоровая пища"
-        val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        builder.setTitle(title) // заголовок
-        builder.setMessage(message) // сообщение
-        builder.setPositiveButton(button1String,
-            DialogInterface.OnClickListener { dialog, id ->
-                Toast.makeText(
-                    activity, "Вы сделали правильный выбор",
-                    Toast.LENGTH_LONG
-                ).show()
-            })
-        builder.setNegativeButton(button2String,
-            DialogInterface.OnClickListener { dialog, id ->
-                Toast.makeText(activity, "Возможно вы правы", Toast.LENGTH_LONG)
-                    .show()
-            })
-        builder.setCancelable(true)
-        return builder.create()
+        _binding = BtDialogFragmentBinding.inflate(layoutInflater, null, false)
+        val dialog = AlertDialog.Builder(context).setView(binding.root).create()
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return dialog
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding= null
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val width = (resources.displayMetrics.widthPixels * 0.50).toInt()
+        val height = (resources.displayMetrics.heightPixels * 0.40).toInt()
+        dialog!!.window?.setLayout(width, height)
+        setListener()
+    }
+
+    fun setListener(){
+        binding.btnSetting.setOnClickListener {
+            openBluetoothSettings()
+        }
+        binding.btnClose.setOnClickListener {
+            onDestroyView()
+        }
+    }
+
+    private fun openBluetoothSettings() {
+        val intent = Intent(Intent.ACTION_MAIN, null)
+        val componentName = ComponentName("ru.sir.settings", "ru.sir.settings.ui.MainActivity")
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.component = componentName
+        intent.putExtra("BluetoothSettings", true)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        startActivity(intent)
+    }
+
+
 }

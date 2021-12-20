@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
+import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,11 +15,9 @@ import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.AllFolderWithMusicRV
 import ru.kamaz.music_api.interactor.CategoryLoadRV
-import ru.kamaz.music_api.interactor.FavoriteMusicRV
 import ru.kamaz.music_api.interactor.LoadData
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.kamaz.music_api.models.CategoryMusicModel
-import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
@@ -41,6 +40,11 @@ class MainListMusicViewModel @Inject constructor(
    private var service: MusicServiceInterface.Service? = null
 
 
+    val pp = MusicPresenter(context)
+
+    fun getUsbList(){
+        pp.openUSBList()
+    }
 
     val howRvModeNow: StateFlow<Int> by lazy {
         Log.i("item", "iiii")

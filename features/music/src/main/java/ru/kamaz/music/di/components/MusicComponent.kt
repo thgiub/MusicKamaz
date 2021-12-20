@@ -9,6 +9,7 @@ import ru.kamaz.music.ui.all_musiclist.TrackFragment
 import ru.kamaz.music.ui.one_song_fragment.MusicFragment
 import ru.kamaz.music.ui.bt.BtFragment
 import ru.kamaz.music.ui.category.CategoryFragment
+import ru.kamaz.music.ui.dialog_windows.DialogBtSettings
 import ru.sir.presentation.base.BaseDaggerComponent
 import javax.inject.Singleton
 
@@ -27,5 +28,7 @@ interface MusicComponent : BaseDaggerComponent {
     fun inject(fragment: MainListMusicFragment)
     fun inject(fragment: CategoryFragment)
     fun inject(fragment: FolderFragment)
+    fun inject(fragment: DialogBtSettings)
+
 
 }

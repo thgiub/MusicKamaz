@@ -84,6 +84,8 @@ ext {
     //Coagent
     coagent = files("$rootDir/libs/coagentproxy.jar")
 
+    xtlibrary = files("$rootDir/libs/xtlibrary.jar")
+
     //Navigation Component
     navigationFragment = "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     navigationUi = "androidx.navigation:navigation-ui-ktx:$navigationVersion"

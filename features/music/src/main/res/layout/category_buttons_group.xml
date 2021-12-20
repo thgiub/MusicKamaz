@@ -1,57 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/view_change_source"
-    android:orientation="horizontal"
-    android:layout_marginTop="@dimen/marginTop"
-    android:layout_marginBottom="@dimen/marginTop"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/folder_music"
-        style="@style/ButtonCategoryOff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/list_music"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf=" parent"
-        android:src="@drawable/ic_folder_music"
-        android:textColor="@color/white"
-        android:layout_marginStart="@dimen/marginTop"
-        android:layout_marginEnd="@dimen/marginTop"
-        android:gravity="center"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-
-    android:id="@+id/list_music"
-        style="@style/ButtonCategoryOff"
-        android:layout_marginStart="@dimen/marginTop"
-        android:layout_marginEnd="@dimen/marginTop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/category_music"
-        app:layout_constraintStart_toEndOf="@id/folder_music"
-        app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center"
-        android:src="@drawable/ic_music_nota"
-
-        android:textColor="@color/white"
-        />
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/category_music"
-        style="@style/ButtonCategoryOff"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/activity_main_togglebutton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:checkedButton="@id/listMusic"
+        android:background="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/list_music"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="@dimen/marginTop"
-        android:layout_marginEnd="@dimen/marginTop"
-        android:gravity="center"
-        android:src="@drawable/open_track_list"
-        android:textColor="@color/white"
-        />
+        app:selectionRequired="true"
+        app:singleSelection="true">
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/folderMusic"
+            style="@style/ToggleButtonSource"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:icon="@drawable/ic_folder_mini"
 
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/listMusic"
+            style="@style/ToggleButtonSource"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:icon="@drawable/ic_music_white"  />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/categoryMusic"
+            style="@style/ToggleButtonSource"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:icon="@drawable/ic_format_indent_white" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

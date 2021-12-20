@@ -9,6 +9,7 @@ import ru.kamaz.music.view_models.DialogViewModel
 import ru.kamaz.music.view_models.MainListMusicViewModel
 import ru.kamaz.music.view_models.TrackViewModel
 import ru.kamaz.music.view_models.MusicFragmentViewModel
+import ru.kamaz.music.view_models.bt.BtDialogFragmentViewModel
 import ru.kamaz.music.view_models.bt.BtFragmentViewModel
 import ru.kamaz.music.view_models.list.ListViewModel
 import ru.kamaz.music.view_models.music_category.CategoryViewModel
@@ -54,6 +55,10 @@ abstract class ViewModelModel() {
     @IntoMap
     @ViewModelKey(DialogViewModel::class)
     abstract fun bindDialogViewModel(model: DialogViewModel): ViewModel
+  @Binds
+    @IntoMap
+    @ViewModelKey(BtDialogFragmentViewModel::class)
+    abstract fun bindBtDialogFragmentViewModel(model: BtDialogFragmentViewModel): ViewModel
 
 
     /*  @Binds

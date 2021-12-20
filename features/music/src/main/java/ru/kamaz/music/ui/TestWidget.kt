@@ -86,7 +86,7 @@ class TestWidget : BaseAppWidget() {
             appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_pause_music)
         }else{
             "ic_pause".easyLog(this)
-            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_play2)
+            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_play_white)
         }
         pushUpdate(context, null, appWidgetView)
     }

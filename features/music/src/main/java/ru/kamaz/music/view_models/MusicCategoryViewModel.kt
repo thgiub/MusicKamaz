@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.databinding.ImageTextItemBinding
+import ru.kamaz.music.databinding.MainCategoryItemBinding
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music.ui.category.CategoryFragment
@@ -17,7 +18,7 @@ import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 
-class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, ImageTextItemBinding>(), MusicServiceInterface.ViewModel,
+class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCategoryItemBinding>(), MusicServiceInterface.ViewModel,
     ServiceConnection {
     private val img = MutableStateFlow(0)
     private val category = MutableStateFlow("")
@@ -28,12 +29,12 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, ImageText
 
     override fun initVars() {
         img.launchWhenStarted(parent.lifecycleScope){
-            binding.customImg.setImageResource(it)
+            binding.imageCategory.setImageResource(it)
         }
         category.launchWhenStarted(parent.lifecycleScope){
-            binding.customTxt.text = it
+            binding.textCategory.text = it
         }
-        binding.customLin.setOnClickListener {
+        binding.clAllItem.setOnClickListener {
             data?.let { (parent as CategoryFragment).clickListener(it.id) }
         }
 

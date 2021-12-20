@@ -21,6 +21,13 @@
     <color name="seek_bar_secondary_progress">#3399CC</color>
     <color name="test">#000000</color>
     <color name="test2">#00000000</color>
+    <color name="btn_select">#597cff</color>
+    <color name="btn_grey_circle">#242E3C</color>
+    <color name="text_item_grey">#90A6CA</color>
+    <color name="grey_lite_line">#707070</color>
 
-    <color name="colorPrimary">#3C3C3B</color>
+
+
+
+    <color name="colorPrimary">#303030</color>
 </resources>

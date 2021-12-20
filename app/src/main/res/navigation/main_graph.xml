@@ -23,4 +23,6 @@
         android:id="@+id/mainListMusicFragment"
         android:name="ru.kamaz.music.ui.MainListMusicFragment"
         android:label="MainListMusicFragment" />
+
+
 </navigation>

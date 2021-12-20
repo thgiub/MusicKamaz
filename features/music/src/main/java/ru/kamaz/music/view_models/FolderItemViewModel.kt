@@ -4,6 +4,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FolderItemRvBinding
+import ru.kamaz.music.databinding.MainCategoryItemBinding
 import ru.kamaz.music.databinding.TestTextItemBinding
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
@@ -11,7 +12,7 @@ import ru.sir.presentation.extensions.launchWhenStarted
 
 
 
-class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, FolderItemRvBinding>(){
+class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategoryItemBinding>(){
     private val artist = MutableStateFlow("")
     private val title = MutableStateFlow(0)
     private lateinit var data: AllFolderWithMusic

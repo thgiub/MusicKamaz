@@ -3,7 +3,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#121212"
+    android:background="@color/black"
     android:clickable="true"
     android:focusable="true"
     android:layout_width="match_parent"
