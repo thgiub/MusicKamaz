@@ -10,6 +10,10 @@ data class FavoriteSongsEntity(
     @ColumnInfo(name = "id_song")
     var idSong: Int,
     @ColumnInfo(name = "data")
-    var data: String
+    var data: String,
+    @ColumnInfo(name = "title")
+    val title: String,
+    @ColumnInfo(name = "artist")
+    val artist: String
 )
 

@@ -80,7 +80,7 @@ class RepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    private fun FavoriteSongs.toDao() = FavoriteSongsEntity(this.idSong, this.data)
+    private fun FavoriteSongs.toDao() = FavoriteSongsEntity(this.idSong, this.data,this.title,this.artist)
     private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title)
     private fun HistorySongs.toDao() = HistorySongsEntity(
         this.dbID,

@@ -58,6 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/info_text_bt_connect"
         >
+
         <Button
             android:id="@+id/btn_setting"
             android:layout_width="0dp"

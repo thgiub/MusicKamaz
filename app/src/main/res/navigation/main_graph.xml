@@ -21,8 +21,12 @@
         android:label="DialogBtSettings" />
     <fragment
         android:id="@+id/mainListMusicFragment"
-        android:name="ru.kamaz.music.ui.MainListMusicFragment"
+        android:name="ru.kamaz.music.ui.list_music.MainListMusicFragment"
         android:label="MainListMusicFragment" />
+    <dialog
+        android:id="@+id/dialogAddPlaylistFragment"
+        android:name="ru.kamaz.music.ui.category.dialog.DialogAddPlaylistFragment"
+        android:label="DialogAddPlaylistFragment" />
 
 
 </navigation>

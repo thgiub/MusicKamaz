@@ -83,10 +83,10 @@ class TestWidget : BaseAppWidget() {
         val appWidgetView = RemoteViews(context.packageName, R.layout.test_widget)
         if (plPause){
             "ic_play".easyLog(this)
-            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_pause_music)
+            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_play_on_circle)
         }else{
             "ic_pause".easyLog(this)
-            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_play_white)
+            appWidgetView.setImageViewResource(R.id.play_pause_widget,R.drawable.ic_ic_circle_play_1)
         }
         pushUpdate(context, null, appWidgetView)
     }

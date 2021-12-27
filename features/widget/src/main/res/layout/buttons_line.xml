@@ -7,24 +7,23 @@
 
     <ImageView
         android:id="@+id/prev_widget"
-        style="@style/controlButton"
-        android:src="@drawable/ic_audio_prew_white"
-         />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/prev_switch" />
 
     <ImageView
         android:id="@+id/play_pause_widget"
-        style="@style/controlButtonBigBlue"
-        android:src="@drawable/ic_play_white"
-        android:layout_marginEnd="@dimen/control_btn_padding"
-        android:layout_marginStart="@dimen/control_btn_padding"
-         />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/ic_play_on_circle" />
 
     <ImageView
         android:id="@+id/next_widget"
-        style="@style/controlButton"
-        android:src="@drawable/ic_audio_next_white"
-        android:visibility="visible"
-
-       />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/next_switch" />
 
 </LinearLayout>

@@ -2,55 +2,50 @@ package ru.kamaz.music.ui.category.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.Window
 import androidx.fragment.app.DialogFragment
-import ru.kamaz.music.view_models.DialogViewModel
-import android.widget.EditText
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-
+import ru.kamaz.music.databinding.DialogAddPlaylistBinding
 
 class DialogAddPlaylistFragment: DialogFragment() {
 
-    private lateinit var viewModel: DialogViewModel
+    private var _binding: DialogAddPlaylistBinding? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get(DialogViewModel::class.java)
-    }
+    private val binding get() = _binding!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
-            val builder = AlertDialog.Builder(it)
-
-            val inflater = requireActivity().layoutInflater
-            val viewDialog= inflater.inflate(ru.kamaz.music.R.layout.dialog_add_playlist, null)
-            builder.setView(viewDialog)
-
-                .setPositiveButton("Заебись",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        val editText: EditText = viewDialog.findViewById(ru.kamaz.music.R.id.etPlaylist)
-                        viewModel.sendName(editText.text.toString())
-                    })
-                .setNegativeButton("Хуйня",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        getDialog()?.cancel()
-                    })
-            builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
+        _binding = DialogAddPlaylistBinding.inflate(layoutInflater, null, false)
+        val dialog = AlertDialog.Builder(context).setView(binding.root).create()
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return dialog
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding= null
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val width = (resources.displayMetrics.widthPixels * 0.40).toInt()
+        val height = (resources.displayMetrics.heightPixels * 0.40).toInt()
+        dialog!!.window?.setLayout(width, height)
+        setListener()
+    }
+
+    fun setListener(){
+        binding.btnSetting.setOnClickListener {
+            onDestroyView()
+        }
+        binding.btnClose.setOnClickListener {
+            onDestroyView()
+        }
+    }
+
+
 
 
 

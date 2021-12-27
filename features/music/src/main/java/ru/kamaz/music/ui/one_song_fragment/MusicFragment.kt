@@ -19,6 +19,7 @@ import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
 import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 import ru.kamaz.music.ui.enums.PlayListFlow
@@ -249,12 +250,8 @@ class MusicFragment :
     }
 
     private fun updateTrackCover(coverPath: String) {
-        //  Log.i("diaz", "IMG + $coverPath ")
 
         if (coverPath.isEmpty()) {
-            /* Picasso.with(context)
-                 .load(R.drawable.png)
-                 .into(binding.picture)*/
         } else {
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath)))
@@ -264,23 +261,11 @@ class MusicFragment :
 
 
     private fun dialog() {
-
-
         navigator.navigateTo(
             UiAction(
-                OPEN_DIALOG_BT_FRAGMENT
+               OPEN_DIALOG_BT_FRAGMENT
             )
         )
-        /*  AlertDialog.Builder(context)
-              .setTitle("Подключите телефон в ")
-              .setMessage("Перейдти в настройки?")
-              .setPositiveButton(R.string.settings,
-                  DialogInterface.OnClickListener { dialog, which ->
-                      openBluetoothSettings()
-                  })
-              .setNegativeButton(R.string.close, null)
-              .setIcon(android.R.drawable.ic_dialog_alert)
-              .show()*/
     }
 
 

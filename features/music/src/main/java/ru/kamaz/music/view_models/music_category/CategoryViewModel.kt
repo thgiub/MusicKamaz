@@ -1,6 +1,7 @@
 package ru.kamaz.music.view_models.music_category
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,6 +13,7 @@ import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import ru.sir.presentation.extensions.launchOn
+import java.io.File
 import javax.inject.Inject
 
 class CategoryViewModel @Inject constructor(
@@ -34,6 +36,11 @@ class CategoryViewModel @Inject constructor(
         const val RV_ITEM_MUSIC_GENRES=9
         const val RV_ITEM_MUSIC_ALBUMS=10
     }
+    private val _itemClick = MutableStateFlow<Boolean>(false)
+    val itemClick = _itemClick.asStateFlow()
+
+    private val _closeBack = MutableStateFlow<Boolean>(false)
+    val closeBack = _closeBack.asStateFlow()
 
     init {
         categoryData(None()) { it.either({}, ::onCategoryLoaded) }
@@ -47,6 +54,23 @@ class CategoryViewModel @Inject constructor(
         artistList(None()) { it.either({}, ::onArtistListRV) }
         artistList(None()) { it.either({}, ::onGenresListRV) }
         artistList(None()) { it.either({}, ::onAlbumsListRV) }
+    }
+    fun onClickBack() {
+        Log.i("resBack", "onClickBack")
+        checkRootPathOfSource()
+    }
+
+    private fun checkRootPathOfSource() {
+        when(itemClick.value){
+            true->{
+                Log.i("resBack", "checkRootPathOfSourcet$itemClick")
+                _closeBack.value=true
+            }
+            false->{
+                Log.i("resBack", "checkRootPathOfSource$itemClick")
+                _closeBack.value=false
+            }
+        }
     }
 
     private val _items = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList ())
@@ -85,24 +109,29 @@ class CategoryViewModel @Inject constructor(
 
     private fun onAllFolderWithMusic(folderMusic: List<AllFolderWithMusic>){
         _items.value = folderMusic.toRecyclerViewItemsFolder()
+        _itemClick.value=true
     }
 
     private fun onArtistListRV(artistMusic: List<Track>){
         val pot = artistMusic.distinctBy { it.artist }
         _artist.value = pot.toRecyclerViewItemsArtist()
+        _itemClick.value=true
     }
 
     private fun onGenresListRV(genresMusic: List<Track>){
         val pot = genresMusic.distinctBy { it.album }
         _genres.value = pot.toRecyclerViewItemsGenres()
+        _itemClick.value=true
     }
     private fun onAlbumsListRV(albumsMusic: List<Track>){
         val pot = albumsMusic.distinctBy { it.album }
         _albums.value = pot.toRecyclerViewItemsAlbums()
+        _itemClick.value=true
     }
 
     private fun onPlayListRV(playListMusic: List<PlayListModel>){
         _playlist.value = playListMusic.toRecyclerViewItemsPlayList()
+        _itemClick.value=true
     }
 
     private fun List<AllFolderWithMusic>.toRecyclerViewItemsFolder(): List<RecyclerViewBaseDataModel> {
@@ -157,6 +186,7 @@ class CategoryViewModel @Inject constructor(
 
     private fun onCategoryLoaded(category: List<CategoryMusicModel>){
         _huitems.value= category.toRecyclerViewItemsCategory()
+        _itemClick.value=true
     }
 
    /* private fun  onFavoriteLoaded(favorite: List<FavoriteSongs>){

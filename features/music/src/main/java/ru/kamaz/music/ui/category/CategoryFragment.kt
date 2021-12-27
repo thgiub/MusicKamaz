@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.util.Log
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import ru.kamaz.music.databinding.FragmentCategoryMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
+import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.enums.PlayListFlow
 import ru.kamaz.music.ui.getTypedSerializable
 import ru.kamaz.music.ui.producers.*
@@ -19,6 +20,8 @@ import ru.kamaz.music.view_models.music_category.CategoryViewModel
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
+import ru.sir.presentation.extensions.launchWhenStarted
+import ru.sir.presentation.navigation.UiAction
 
 class CategoryFragment :
     BaseFragment<CategoryViewModel, FragmentCategoryMusicBinding>(CategoryViewModel::class.java) {
@@ -38,24 +41,24 @@ class CategoryFragment :
     ) = FragmentCategoryMusicBinding.inflate(inflater, container, false)
 
     override fun initVars() {
-     /*   if(main == PlayListFlow.MAIN_WINDOW){
-            binding.rvCategory.adapter = recyclerViewAdapterPlayList()
-            Log.i("category1", "initVars: ")
-        }
-        if (main==PlayListFlow.SECOND_WINDOW){
-            binding.rvCategory.adapter = recyclerViewAdapter2()
-            Log.i("category2", "initVars: ")
-        }*/
-
         binding.rvCategory.layoutManager = GridLayoutManager(context, 5)
         binding.rvCategory.adapter = recyclerViewAdapter2()
+        viewModel.closeBack.launchWhenStarted(lifecycleScope) {
+          //  if (it) super.onBackPressed()
+            Log.i("resBack", "buttonListener")
+        }
         Log.i("category2", "initVars: ")
-
     }
 
+    override fun setListeners() {
+        super.setListeners()
+    }
     fun clickListener(id: Int) {
+        Log.i("category2", "initVars:$id ")
         when (id) {
-            0 -> binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+            0 -> {
+                clickAddNewPlayList()
+            }
             1 -> {
                 binding.rvCategory.layoutManager = GridLayoutManager(context, 4)
                 binding.rvCategory.adapter = recyclerViewAdapterArtist()
@@ -67,9 +70,20 @@ class CategoryFragment :
                 binding.rvCategory.adapter = recyclerViewAdapterAlbums()
             }
             4 -> {
-                binding.rvCategory.adapter = recyclerViewAdapterPlayList()
+                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+            }
+            5->{
+                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+            }
+            6->{
+                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
             }
         }
+    }
+
+    override fun onBackPressed() {
+        Log.i("resBack", "onBackPressed")
+        viewModel.onClickBack()
     }
 
 
@@ -78,7 +92,12 @@ class CategoryFragment :
     }
 
     private fun dialog(){
-       DialogWithData().show(childFragmentManager, DialogWithData.TAG)
+
+        navigator.navigateTo(
+            UiAction(
+                NavAction.OPEN_ADD_PLAY_LIST_DIALOG
+            )
+        )
     }
 
     private fun  recyclerViewAdapter2() = RecyclerViewAdapter.Builder(this, viewModel.huitems)

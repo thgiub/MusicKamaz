@@ -64,9 +64,10 @@ class TrackViewModel @Inject constructor(
         Toast.makeText(context, "Не найдено аудиофайлов на устройсве", Toast.LENGTH_LONG).show()
     }*/
 
-    fun onItemClick(track: Track) {
+    fun onItemClick(track: Track, data: String) {
         service?.intMediaPlayer()
-        service?.testPlay(track)
+        service?.initTrack(track, data)
+        service?.playOrPause()
         Log.i("onTrackClicked", "onTrackClicked")
     }
 

@@ -17,6 +17,8 @@
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_more_white.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_music_bg.xml" value="0.3769230769230769" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_music_white.xml" value="0.3828125" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_next_on_circle.xml" value="0.3145833333333333" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_next_switch.xml" value="0.3145833333333333" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_pause_white.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_pep1.xml" value="0.30104166666666665" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_pep2.xml" value="0.30104166666666665" />
@@ -24,12 +26,16 @@
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_play_center_2.xml" value="0.3769230769230769" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_play_white.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_plus_white.xml" value="0.3828125" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_prev_on_circle.xml" value="0.3145833333333333" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_prev_on_circle_blue.xml" value="0.3671875" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_refresh_blue_all.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_refresh_blue_one.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_refresh_white.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_repeat.xml" value="0.2609375" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_seekbar_thumb.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/ic_shuffle_blue.xml" value="0.3828125" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/next_switch.xml" value="0.3145833333333333" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/mediator/src/main/res/drawable/prev_switch.xml" value="0.3671875" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/drawable-nodpi/ic_arrow_left.xml" value="0.32708333333333334" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/drawable-nodpi/ic_picture_mini.xml" value="0.35846153846153844" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/drawable-nodpi/toggle_divider.xml" value="0.3537037037037037" />
@@ -98,7 +104,7 @@
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/drawable/thumb.xml" value="0.3828125" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout-land/include_action_buttons.xml" value="0.27204585537918874" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/albums_item.xml" value="0.27708333333333335" />
-        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/bt_dialog_fragment.xml" value="0.25" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/bt_dialog_fragment.xml" value="0.2" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/bt_fragment.xml" value="0.15881458966565348" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/buttons_fragment.xml" value="0.16058763931104356" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/buttons_music_source.xml" value="0.22" />
@@ -118,15 +124,16 @@
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/image_text_item.xml" value="0.16869300911854104" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/include_action_buttons.xml" value="0.32135416666666666" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/item_pager.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/main_category_item.xml" value="0.2" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/main_category_item.xml" value="0.6202143950995406" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/material_button_category_layout.xml" value="0.67" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/music_lists_fragment.xml" value="0.24873353596757852" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/play_list_add_new_item.xml" value="0.3278985507246377" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/playlist_item.xml" value="0.25" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/test.xml" value="0.2617753623188406" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/test_text_item.xml" value="0.25" />
-        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/test_widget.xml" value="0.2617753623188406" />
-        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/widget/src/main/res/layout/buttons_line.xml" value="0.20244565217391305" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/test_widget.xml" value="0.33" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/music/src/main/res/layout/widget_layout.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/widget/src/main/res/layout/buttons_line.xml" value="0.2" />
         <entry key="..\:/Users/ilshat/AndroidStudioProjects/MusicKamazSave/features/widget/src/main/res/layout/music_widget.xml" value="0.321875" />
         <entry key="..\:/Users/ilshat/AppData/Local/Android/Sdk/platforms/android-30/data/res/layout/activity_list_item.xml" value="0.3278985507246377" />
         <entry key="..\:/Users/ilshat/AppData/Local/Android/Sdk/platforms/android-30/data/res/layout/select_dialog_multichoice.xml" value="0.3278985507246377" />

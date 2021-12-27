@@ -1,10 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/back_item"
+    android:background="@drawable/ic_back_wwww"
     android:gravity="center_vertical"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="2dp"
+    android:layout_marginStart="30dp"
+    android:layout_marginEnd="30dp"
+    >
 
     <LinearLayout
         android:id="@+id/ll_back"
@@ -12,7 +15,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
-        android:background="@drawable/bluetooth_back"
+        android:background="@drawable/ic_bg_folder_widget"
         android:gravity="bottom">
 
         <TextView

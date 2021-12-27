@@ -903,7 +903,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             deleteFavoriteMusic()
         } else {
             _isFavorite.value = true
-            val music = FavoriteSongs(idSong.value, data.value)
+            val music = FavoriteSongs(idSong.value, data.value,title.value,artist.value)
             insertFavoriteMusic(InsertFavoriteMusic.Params(music))
         }
     }
@@ -916,7 +916,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun deleteFavoriteMusic() {
         _isFavorite.value = false
-        val music = FavoriteSongs(idSong.value, data.value)
+        val music = FavoriteSongs(idSong.value, data.value,title.value,artist.value)
         deleteFavoriteMusic(DeleteFavoriteMusic.Params(music))
     }
 

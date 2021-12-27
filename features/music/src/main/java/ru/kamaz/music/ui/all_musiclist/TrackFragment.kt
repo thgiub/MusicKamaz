@@ -43,7 +43,7 @@ class TrackFragment :
         super.setListeners()
     }
     fun onTrackClicked(track: Track) {
-        viewModel.onItemClick(track)
+        viewModel.onItemClick(track , track.data)
     }
 
     private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)

@@ -71,7 +71,8 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
 
     private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>):List<FavoriteSongs>{
         val data = mutableListOf<FavoriteSongs>()
-        entity.forEach { data.add(FavoriteSongs(it.idSong,it.data)) }
+        entity.forEach {
+            data.add(FavoriteSongs(it.idSong,it.data,it.title,it.artist)) }
         return data
     }
 
