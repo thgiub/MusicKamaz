@@ -61,8 +61,8 @@ dependencies {
     kapt daggerCompiler
     implementation kotlinCoroutines
     implementation kotlinCoroutinesCore
-    api twManager
-    api twManagerCore
+    implementation twManager
+    implementation twManagerCore
     implementation xtlibrary
     implementation project(path: ':entities:core')
 
