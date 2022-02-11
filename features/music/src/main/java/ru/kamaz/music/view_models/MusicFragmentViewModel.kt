@@ -17,6 +17,7 @@ import ru.biozzlab.twmanager.utils.easyLog
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.GetMusicPosition
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
@@ -26,7 +27,8 @@ import javax.inject.Inject
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
     private val mediaManager: MediaManager,
-    private val getMusicPosition: GetMusicPosition
+    private val getMusicPosition: GetMusicPosition,
+    private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
     MusicServiceInterface.ViewModel,MusicManagerListener {
     private var tracks = ArrayList<Track>()
@@ -118,15 +120,6 @@ class MusicFragmentViewModel @Inject constructor(
         super.onCreate()
     }
 
-    fun startTrack() {
-        if (tracks.isEmpty()) {
-            Log.d("mediaPlayer", "no")
-            musicEmpty()
-        } else
-            service.value?.testPlay(tracks[currentTrackPosition])
-        Log.d("mediaPlayer", "no")
-
-    }
 
     fun shuffleStatusChange(){
         service.value?.shuffleStatusChange()
@@ -162,6 +155,7 @@ class MusicFragmentViewModel @Inject constructor(
             tracks.addAll(result.r)
         }
     }
+
 
     fun vmSourceSelection(action: MusicService.SourceEnum) {
         when (action) {

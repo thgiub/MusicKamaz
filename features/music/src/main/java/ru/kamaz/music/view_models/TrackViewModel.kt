@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.LoadData
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.None
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
     application: Application,
-    private val loadData: LoadData
+    private val loadData: LoadData,
+    private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), ServiceConnection {
 
     companion object {
@@ -59,11 +61,6 @@ class TrackViewModel @Inject constructor(
         _isLoading.value = false
 
     }
-
-   /* fun toast() {
-        Toast.makeText(context, "Не найдено аудиофайлов на устройсве", Toast.LENGTH_LONG).show()
-    }*/
-
     fun onItemClick(track: Track, data: String) {
         service?.intMediaPlayer()
         service?.initTrack(track, data)

@@ -41,12 +41,6 @@ class MainListMusicFragment
         viewModel.howRvModeNow.launchWhenStarted(lifecycleScope){
             Log.i("item", "$it click")
         }
-      /*  if(main == PlayListFlow.MAIN_WINDOW){
-            startCategoryMusic()
-        }
-        if (main==PlayListFlow.SECOND_WINDOW){
-
-        }*/
         startListAllMusic()
     }
 
@@ -64,16 +58,16 @@ class MainListMusicFragment
     }
 
     private fun startCategoryMusic(){
-        parentFragmentManager.beginTransaction().replace(R.id.fragment, CategoryFragment()).commit()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment, CategoryFragment()).addToBackStack("CategoryFragment").commit()
     }
 
     private fun  startListAllMusic(){
-        parentFragmentManager.beginTransaction().replace(R.id.fragment, TrackFragment()).commit()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment, TrackFragment()).addToBackStack("TrackFragment").commit()
 
     }
 
     private fun startFolderListFragment(){
-        parentFragmentManager.beginTransaction().replace(R.id.fragment, FolderFragment()).commit()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment, FolderFragment()).addToBackStack("FolderFragment").commit()
     }
 
 

@@ -44,7 +44,7 @@ class CategoryFragment :
         binding.rvCategory.layoutManager = GridLayoutManager(context, 5)
         binding.rvCategory.adapter = recyclerViewAdapter2()
         viewModel.closeBack.launchWhenStarted(lifecycleScope) {
-          //  if (it) super.onBackPressed()
+            if (it) super.onBackPressed()
             Log.i("resBack", "buttonListener")
         }
         Log.i("category2", "initVars: ")
@@ -70,14 +70,12 @@ class CategoryFragment :
                 binding.rvCategory.adapter = recyclerViewAdapterAlbums()
             }
             4 -> {
-                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+                binding.rvCategory.adapter = recyclerViewAdapterPlayList()
             }
             5->{
                 binding.rvCategory.adapter = recyclerViewAdapterFavorite()
             }
-            6->{
-                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
-            }
+
         }
     }
 
@@ -115,7 +113,6 @@ class CategoryFragment :
 
     private fun recyclerViewAdapterPlayList() =
         RecyclerViewAdapter.Builder(this, viewModel.playlist)
-            .addProducer(MusicPlayListAddNewHolder())
             .addProducer(MusicPlayListViewHolder())
             .build { it }
 

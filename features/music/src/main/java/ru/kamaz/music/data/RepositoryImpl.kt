@@ -1,6 +1,13 @@
 package ru.kamaz.music.data
 
+import android.hardware.usb.UsbManager
 import android.media.MediaPlayer
+import android.net.Uri
+import android.util.Log
+import android.webkit.MimeTypeMap
+import androidx.fragment.app.FragmentManager
+import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
+import com.eckom.xtlibrary.twproject.music.utils.TWMusic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -53,7 +60,6 @@ class RepositoryImpl(
     override fun insertPlayList(song: PlayListModel): Either<Failure, None> =
         testDBDao.insertPlayList(song.toDao())
 
-
     override fun deletePlayList(song: PlayListModel): Either<Failure, None> =
         testDBDao.deletePlayList(song.toDao())
 
@@ -100,7 +106,7 @@ class RepositoryImpl(
         this.timePlayed
     )
 
-    private val devicePath = "/storage/emulated/0"
+    private val devicePath = "/storage/usbdisk0"
 
     private var pathSourceRootDirectory: String = devicePath
     private var pathSelectedDirectory: String = devicePath
@@ -109,9 +115,8 @@ class RepositoryImpl(
     override suspend fun rootFilesFromSource(source: SourceType): List<File> {
         sourceType = source
         val listFiles = when (source) {
-            SourceType.MEDIA_AUDIO, SourceType.MEDIA_IMAGE, SourceType.MEDIA_VIDEO -> readMediaStore(
-                source
-            )
+            SourceType.MEDIA_AUDIO -> readMediaStore(source)
+            SourceType.NO_MEDIA -> getNoMediaFiles()
             else -> getFiles(devicePath) //пока так
         }
         pathSelectedDirectory = pathSourceRootDirectory
@@ -119,16 +124,37 @@ class RepositoryImpl(
     }
 
 
-    private fun getFiles(path: String): List<File> {
+   override fun getFiles(path: String): List<File> {
         val file = File(path)
         val list = file.listFiles().toList().sorted()
+        Log.i("usbMusic", "getFiles: $list")
+        mediaPlayer.setDataSource("/storage/usbdisk0/Моргенштерн - Я лью кристал.mp3")
         return (list)
-
     }
 
     private fun readMediaStore(media1: SourceType): List<File> {
-        val mediaFiles = media.scanMediaFiles(media1)
-        return (mediaFiles)
+        val mediaFiles = media.scanFoldersWithMusic(media1)
+        return mediaFiles
     }
+    private fun getNoMediaFiles(): List<File> {
+        val resultList = mutableListOf<File>()
+        val allFiles = File(devicePath).listFiles()
+        val mimeList = arrayOf(
+            "mp3",
+            "mp4"
+        )
+        for (item in allFiles) {
+            //если это не Папка
+            if (!item.isDirectory) {
+                val uriFile: Uri = Uri.fromFile(item)
+                val mime = MimeTypeMap.getFileExtensionFromUrl(uriFile.toString())
+                //если расширение не входит в перечень - добавляем
+                if (mime !in mimeList) resultList.add(item)
+            }
+
+        }
+        return resultList
+    }
+
 
 }

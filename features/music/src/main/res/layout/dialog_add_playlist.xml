@@ -58,7 +58,7 @@
         app:layout_constraintTop_toBottomOf="@+id/et_add_play_list"
         >
         <Button
-            android:id="@+id/btn_setting"
+            android:id="@+id/btn_close"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:background="@drawable/back_category_music_off"
@@ -68,11 +68,11 @@
             android:layout_marginEnd="12dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_close"
+            app:layout_constraintEnd_toStartOf="@+id/btn_get"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/btn_close"
+            android:id="@+id/btn_get"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:text="Создать"
@@ -82,7 +82,7 @@
             android:background="@drawable/back_category_music_off"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btn_setting"
+            app:layout_constraintStart_toEndOf="@+id/btn_close"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

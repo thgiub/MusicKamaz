@@ -2,6 +2,7 @@ package ru.kamaz.music.view_models.music_category
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import ru.kamaz.music.databinding.MainCategoryItemBinding
 import ru.kamaz.music.databinding.PlayListAddNewItemBinding
 import ru.kamaz.music.databinding.PlaylistItemBinding
 import ru.kamaz.music.databinding.TestTextItemBinding
@@ -11,14 +12,14 @@ import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 
 
-class ItemPlayListViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding>(){
-    private val id = MutableStateFlow(0)
-    private val dataMusic = MutableStateFlow("")
+class ItemPlayListViewModel : RecyclerViewBaseItem<PlayListModel, MainCategoryItemBinding>(){
+
+    private val playlist = MutableStateFlow("")
     private lateinit var data: PlayListModel
 
     override fun initVars() {
-        id.launchWhenStarted(parent.lifecycleScope){
-            binding.playListTrackNumber.text= it.toString()
+        playlist.launchWhenStarted(parent.lifecycleScope){
+            binding.textCategory.text = it
         }
 
         binding.root.setOnClickListener {
@@ -27,8 +28,6 @@ class ItemPlayListViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBi
     }
     override fun bindData(data: PlayListModel) {
         this.data = data
-        id.value = data.id.toInt()
-        dataMusic.value = data.title
-
+        playlist.value = data.title
     }
 }

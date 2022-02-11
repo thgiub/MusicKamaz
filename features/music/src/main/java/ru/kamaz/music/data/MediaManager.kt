@@ -8,11 +8,13 @@ import java.io.File
 
 interface MediaManager {
     fun scanTracks(type:Int): Either<None, List<Track>>
-    fun scanUSBTracks(): Either<None, List<Track>>
+    fun scanUSBTracks(path:String): Either<None, List<Track>>
     fun getAlbumImagePath(albumID: Long): Either<None, String>
     fun getCategory():Either<None, List<CategoryMusicModel>>
     fun getAllFolder(): Either<None, List<AllFolderWithMusic>>
-    fun scanMediaFiles(sourceType: SourceType): List<File>
+    fun scanFoldersWithMusic(sourceType: SourceType): List<File>
+    fun getFilesFromPath(path: String, bool1:Boolean,bool2:Boolean): List<File>
+
    // fun getFolderWithMusic():Either<None, List<FolderMusicModel>>
 
 }

@@ -2,6 +2,7 @@ package ru.kamaz.music.di.modules
 
 import dagger.Module
 import dagger.Provides
+import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.interfaces.Repository
 
@@ -23,6 +24,10 @@ class DomainModule {
 
     @Provides
     fun provideGetMusicPosition(repository: Repository): GetMusicPosition = GetMusicPosition(repository)
+    @Provides
+    fun provideGetUseCase(repository: Repository): GetFilesUseCase {
+        return GetFilesUseCaseImpl(repository)
+    }
 
     @Provides
     fun provideInsertFavoriteMusic(repository: Repository): InsertFavoriteMusic = InsertFavoriteMusic(repository)
@@ -34,9 +39,10 @@ class DomainModule {
     fun provideQueryFavoriteMusic(repository: Repository): QueryFavoriteMusic = QueryFavoriteMusic(repository)
    @Provides
     fun provideFavoriteMusicRV(repository: Repository): FavoriteMusicRV = FavoriteMusicRV(repository)
-
     @Provides
     fun providePlayListRV(repository: Repository): PlayListRV = PlayListRV(repository)
+    @Provides
+    fun provideInsertPlayList(repository: Repository): InsertPlayList = InsertPlayList(repository)
     @Provides
     fun provideDeleteFavoriteMusic(repository: Repository): DeleteFavoriteMusic = DeleteFavoriteMusic(repository)
 }

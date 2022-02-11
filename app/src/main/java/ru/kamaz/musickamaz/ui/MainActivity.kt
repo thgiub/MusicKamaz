@@ -2,6 +2,7 @@ package ru.kamaz.musickamaz.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -39,6 +40,11 @@ class MainActivity : BaseActivity() {
         when(PermissionUtils.isPermissionsGranted(this)) {
             false -> requestPermissions()
         }
+    }
+
+    override fun onBackPressed() {
+        Log.i("back", "onBackPressed: back")
+        super.onBackPressed()
     }
 
     private fun requestPermissions() {

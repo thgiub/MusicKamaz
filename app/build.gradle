@@ -30,6 +30,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xallow-result-return-type"]
     }
     viewBinding {
         enabled = true
@@ -38,6 +39,11 @@ android {
 }
 
 apply from: "$rootDir/deps/deps_versions.gradle"
+
+ext {
+    coroutines_version = '1.5.2'
+    daggerVersion = '2.38.1'
+}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -53,6 +59,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation project(path: ':features:music')
 
     api twManager

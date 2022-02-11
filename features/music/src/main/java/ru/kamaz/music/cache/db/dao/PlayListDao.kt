@@ -14,9 +14,6 @@ interface PlayListDao  {
     @Delete
     fun delete(playList: PlayListEntity)
 
-/*    @Query("SELECT * FROM like_songs WHERE data=:data")
-    fun loadAll(data:String): PlayListEntity*/
-
     @Query("SELECT * FROM play_list ")
     fun getData(): Flow<List<PlayListEntity>>
 

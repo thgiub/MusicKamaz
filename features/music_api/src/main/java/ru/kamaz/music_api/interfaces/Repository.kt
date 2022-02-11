@@ -25,7 +25,8 @@ interface Repository: PathManager, SourceManager {
     fun insertHistorySong(song: HistorySongs): Either<Failure, None>
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
     fun queryHistorySongs() : Either<Failure, String>
-    suspend fun rootFilesFromSource(source: SourceType): List<File>
+    suspend fun rootFilesFromSource(source: SourceType):List<File>
+    fun getFiles(path: String): List<File>
  //suspend fun getFilesFromDirectory(path: String): List<File
 
 

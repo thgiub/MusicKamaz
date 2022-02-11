@@ -5,21 +5,21 @@ import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.os.bundleOf
-import androidx.core.view.marginStart
 import androidx.lifecycle.lifecycleScope
+import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
 import ru.kamaz.music.services.MusicService
-import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 import ru.kamaz.music.ui.enums.PlayListFlow
@@ -52,13 +52,17 @@ class MusicFragment :
         FragmentPlayerBinding.inflate(inflater, container, false)
 
     override fun onResume() {
-        viewModel.startTrack()
+       //      viewModel.startTrack()
+        val presenter = MusicPresenter(context)
+        presenter.openUSBList()
+        presenter.getRecord()
         super.onResume()
     }
 
     override fun setListeners() {
         binding.next.setOnClickListener {
             viewModel.nextTrack()
+            addEvent2()
         }
 
         binding.controlPanel.playPause
@@ -70,6 +74,7 @@ class MusicFragment :
         }
         binding.prev.setOnClickListener {
             viewModel.previousTrack()
+            addEvent()
         }
         binding.openListFragment.setOnClickListener {
             navigator.navigateTo(
@@ -100,6 +105,7 @@ class MusicFragment :
         }
         binding.controlPanel.repeat.setOnClickListener {
             viewModel.repeatChange()
+
         }
         binding.controlPanel.addToFolder.setOnClickListener {
             navigator.navigateTo(
@@ -125,6 +131,27 @@ class MusicFragment :
             }
         })
         super.setListeners()
+    }
+
+    val WHERE_MY_CAT_ACTION = "ru.kamaz.musickamaz"
+    val ALARM_MESSAGE = "Срочно пришлите кота!"
+    val PREV="com.tw.music.action.prev"
+
+    fun addEvent() {
+        val intent = Intent()
+        intent.action = WHERE_MY_CAT_ACTION
+        intent.putExtra("ru.kamaz.musickamaz", ALARM_MESSAGE)
+        intent.putExtra("com.tw.music.action.prev", ALARM_MESSAGE)
+        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+        context?.sendBroadcast(intent)
+    }
+
+    fun addEvent2() {
+        val intent = Intent()
+        intent.action = PREV
+        intent.putExtra("com.tw.music.action.prev", ALARM_MESSAGE)
+        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+        context?.sendBroadcast(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -165,7 +192,6 @@ class MusicFragment :
         viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
             else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_center)
-
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {
@@ -312,7 +338,7 @@ class MusicFragment :
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.pictureDevice.setBackgroundResource(R.drawable.bluetooth_back)
+        binding.picture.setBackgroundResource(R.drawable.bluetooth_back)
         binding.textUsb.visibility = View.INVISIBLE
 
     }

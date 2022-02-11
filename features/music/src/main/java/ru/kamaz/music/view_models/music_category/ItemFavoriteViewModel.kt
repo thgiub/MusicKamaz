@@ -9,8 +9,6 @@ import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 
 class ItemFavoriteViewModel : RecyclerViewBaseItem<FavoriteSongs, MainCategoryItemBinding>(){
-
-
     private val artist = MutableStateFlow("")
     private val title =MutableStateFlow("")
     private lateinit var data: FavoriteSongs
@@ -19,9 +17,6 @@ class ItemFavoriteViewModel : RecyclerViewBaseItem<FavoriteSongs, MainCategoryIt
         title.launchWhenStarted(parent.lifecycleScope){
             binding.textCategory.text = it
         }
-      /*  artist.launchWhenStarted(parent.lifecycleScope){
-                //binding.artistName.text= it.toString()
-            }*/
         binding.root.setOnClickListener {
 
         }
@@ -30,8 +25,6 @@ class ItemFavoriteViewModel : RecyclerViewBaseItem<FavoriteSongs, MainCategoryIt
     override fun bindData(data: FavoriteSongs) {
         this.data = data
         title.value = data.title
-       // artist.value = data.artist
-       // img.value = data.idSong
 
     }
 }
