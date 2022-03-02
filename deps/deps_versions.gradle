@@ -81,6 +81,8 @@ ext {
     twManager = files("$rootDir/libs/twmanager.aar")
     twManagerCore = files("$rootDir/libs/twmanager_core.aar")
 
+    bwMediaPlayer = files("$rootDir/libs/bwmusicproxy-release.aar")
+
     //Coagent
     coagent = files("$rootDir/libs/coagentproxy.jar")
 

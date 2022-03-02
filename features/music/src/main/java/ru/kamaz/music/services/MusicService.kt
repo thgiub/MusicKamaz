@@ -23,6 +23,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
+import com.bw.musicproxy.manager.AuxManager
+import com.bw.musicproxy.manager.BtManager
 import com.eckom.xtlibrary.twproject.music.bean.MusicName
 import com.eckom.xtlibrary.twproject.music.bean.Record
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
@@ -97,6 +99,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     val twManager = BluetoothManager()
+
+    val bwBtManager = BtManager.getInstance()
 
     private val twManagerMusic = MusicManager()
 
@@ -207,6 +211,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
+    val ads: AuxManager = AuxManager.getInstance()
+
 
     private val _duration = MutableStateFlow("00:00")
     val duration = _duration.asStateFlow()
@@ -308,10 +314,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         registerReceiver(br, filter)
 
         updateTracks(mediaManager)
-        twManager.startMonitoring(applicationContext) {
+      /*  twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
             twManager.requestConnectionInfo()
-        }
+        }*/
         artist.launchOn(lifecycleScope) {
             widgettest.updateTestArtist(this, it)
         }
@@ -534,22 +540,22 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     fun stopBtListener() {
-        try {
+
+        bwBtManager.disConnectToSession()
+      /*  try {
             twManager.playerPlayPause()
             twManager.removeListener(this)
             twManager.stopMonitoring(applicationContext)
 
         } catch (e: Exception) {
 
-        }
+        }*/
 
     }
 
     fun startBtListener() {
-        twManager.startMonitoring(applicationContext) {
-            twManager.addListener(this)
-            twManager.requestConnectionInfo()
-        }
+            bwBtManager.init(this)
+        bwBtManager.connectToSession()
     }
 
     fun startMusicListener() {
@@ -642,7 +648,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             }
             SourceEnum.BT -> {
-                twManager.playerPlayPause()
+                if(bwBtManager.isPlaying)bwBtManager.pause()
+                else bwBtManager.stop()
             }
             SourceEnum.AUX -> TODO()
         }
@@ -721,7 +728,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
             }
             SourceEnum.BT -> {
-                twManager.playerPrev()
+
+                    bwBtManager.prev()
             }
             SourceEnum.AUX -> TODO()
             SourceEnum.USB -> TODO()
@@ -764,10 +772,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             }
             SourceEnum.BT -> {
-                twManager.playerNext()
+                bwBtManager.next()
             }
             SourceEnum.AUX -> {
-
+                ads.isAuxConnected
             }
 
             SourceEnum.USB -> {

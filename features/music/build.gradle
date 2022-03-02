@@ -64,6 +64,7 @@ dependencies {
     api twManager
     api twManagerCore
     implementation xtlibrary
+    implementation bwMediaPlayer
     implementation project(path: ':entities:core')
 
     implementation "androidx.room:room-ktx:2.3.0"
