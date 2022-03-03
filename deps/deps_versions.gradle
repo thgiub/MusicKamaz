@@ -76,6 +76,7 @@ ext {
     //CanTranslator
     canTranslator = files("$rootDir/libs/CanTranslator.aar")
     canTranslatorCore = files("$rootDir/libs/CanTranslatorCore.aar")
+    bwManager = files("$rootDir/libs/bwmusicproxy-release.aar")
 
     //TWManager
     twManager = files("$rootDir/libs/twmanager.aar")

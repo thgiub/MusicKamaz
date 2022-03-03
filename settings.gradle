@@ -7,3 +7,7 @@ include ':entities:core'
 include ':entities:data'
 include ':entities:presentation'
 rootProject.name = "MusicKamaz"
+include ':mylibrary'
+include ':lib'
+include ':nativelib'
+include ':mylibrary'

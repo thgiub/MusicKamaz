@@ -23,6 +23,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
+import com.bw.musicproxy.manager.BtManager
 import com.eckom.xtlibrary.twproject.music.bean.MusicName
 import com.eckom.xtlibrary.twproject.music.bean.Record
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
@@ -97,6 +98,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     val twManager = BluetoothManager()
+
+    val bwManager= BtManager.getInstance()
 
     private val twManagerMusic = MusicManager()
 
