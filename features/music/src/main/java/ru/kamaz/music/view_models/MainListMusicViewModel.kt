@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
+//import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,10 +40,10 @@ class MainListMusicViewModel @Inject constructor(
    private var service: MusicServiceInterface.Service? = null
 
 
-    val pp = MusicPresenter(context)
+    ///val pp = MusicPresenter(context)
 
     fun getUsbList(){
-        pp.openUSBList()
+       // pp.openUSBList()
     }
 
     val howRvModeNow: StateFlow<Int> by lazy {

@@ -25,10 +25,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
 import com.bw.musicproxy.manager.AuxManager
 import com.bw.musicproxy.manager.BtManager
-import com.eckom.xtlibrary.twproject.music.bean.MusicName
-import com.eckom.xtlibrary.twproject.music.bean.Record
-import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
-import com.eckom.xtlibrary.twproject.music.utils.TWMusic
+
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
@@ -102,7 +99,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     val bwBtManager = BtManager.getInstance()
 
-    private val twManagerMusic = MusicManager()
+   // private val twManagerMusic = MusicManager()
 
     lateinit var device: BluetoothDevice
 
@@ -389,7 +386,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    var mCList: Record? = null
+    /*var mCList: Record? = null
 
     var mUSBRecordArrayList: MutableList<Record> = mutableListOf()
 
@@ -465,7 +462,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
         }
     }
-
+*/
 
     override fun onDeviceConnected() {
         _isNotConnected.value = false
@@ -559,11 +556,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     fun startMusicListener() {
-        twManagerMusic.addListener(this)
+      //  twManagerMusic.addListener(this)
     }
 
     fun stopMusicListener() {
-        twManagerMusic.removeListener(this)
+       // twManagerMusic.removeListener(this)
     }
 
     override fun initTrack(track: Track, data1: String) {
@@ -1060,15 +1057,15 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    val twMusic:TWMusic = TWMusic.open()
+   // val twMusic:TWMusic = TWMusic.open()
     val usbManager: UsbManager? = null
 
 
     fun usbTest(){
       //  val presenter = MusicPresenter(context)
        // presenter.openUSBList()
-        twMusic.addRecordUSB("/storage/usbdisk0")
-        twMusic.addRecordUSB("/storage/usbdisk0/Моргенштерн - Я лью кристал.mp3")
+        //twMusic.addRecordUSB("/storage/usbdisk0")
+      //  twMusic.addRecordUSB("/storage/usbdisk0/Моргенштерн - Я лью кристал.mp3")
         //presenter.musicPlay()
 
         Log.i("USBlib ", "usbTest: ")

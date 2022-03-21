@@ -13,7 +13,7 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
+//import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
@@ -53,9 +53,9 @@ class MusicFragment :
 
     override fun onResume() {
        //      viewModel.startTrack()
-        val presenter = MusicPresenter(context)
-        presenter.openUSBList()
-        presenter.getRecord()
+        //val presenter = MusicPresenter(context)
+       // presenter.openUSBList()
+       // presenter.getRecord()
         super.onResume()
     }
 

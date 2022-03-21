@@ -1,13 +1,8 @@
 package ru.kamaz.music.data
-
-import android.hardware.usb.UsbManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.fragment.app.FragmentManager
-import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
-import com.eckom.xtlibrary.twproject.music.utils.TWMusic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "ru.kamaz.musickamaz"
-        minSdkVersion 26
+        minSdkVersion 28
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -54,7 +54,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation project(path: ':features:mediator')
     implementation project(path: ':features:widget')
-    implementation files('C:\\Users\\ilshat\\AndroidStudioProjects\\MusicKamazSave\\libs\\xtlibrary.jar')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
