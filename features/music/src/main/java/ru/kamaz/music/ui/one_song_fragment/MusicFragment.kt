@@ -11,16 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-//import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
 import ru.kamaz.music.services.MusicService
-import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
+import ru.kamaz.music.ui.NavAction.OPEN_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 import ru.kamaz.music.ui.enums.PlayListFlow
 import ru.kamaz.music.view_models.MusicFragmentViewModel
@@ -287,11 +287,12 @@ class MusicFragment :
 
 
     private fun dialog() {
-        navigator.navigateTo(
+      /*  navigator.navigateTo(
             UiAction(
-               OPEN_DIALOG_BT_FRAGMENT
+                OPEN_BT_FRAGMENT
             )
-        )
+        )*/
+        Toast.makeText(context,"Подключите устройство по BT", Toast.LENGTH_SHORT).show()
     }
 
 

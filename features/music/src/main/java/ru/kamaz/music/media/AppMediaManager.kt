@@ -19,7 +19,7 @@ import kotlin.random.Random
 class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
 
-/*    override fun scanTracks(type: Int): Either<None, List<Track>> {
+    override fun scanTracks(type: Int): Either<None, List<Track>> {
         val array = ArrayList<Track>()
         val uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -31,12 +31,8 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ALBUM
         )
-
-        var DOWNLOAD_FILE_DIR =
-            Environment.getExternalStorageDirectory().getPath() + "/mnt/media_rw/usbdisk0"
         val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
-        *//*val selection = "${MediaStore.Audio.Media.IS_MUSIC   + " != 0 AND " +
-                MediaStore.Audio.Media.DATA + " LIKE '"+/mnt/media_rw/usbdisk0+"/%'}  *//*
+
         val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
 
         val cursor = context.contentResolver.query(uri,
@@ -45,14 +41,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             null,
             sortOrder)
 
-      *//*  val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " +
-                MediaStore.Audio.Media.DATA + " LIKE '/storage/usbdisk0/Музыка для тестов%'"
-
-       // val selection = "${MediaStore.Audio.Media.IS_MUSIC}  != 0"
-
-        val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
-
-        val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)*//*
 
         if (cursor != null) {
             cursor.moveToFirst()
@@ -94,7 +82,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
         Log.i("trackList", "scanTracks: $array")
         return Either.Right(array)
-    }*/
+    }
 
     fun readRecursive(root:File, extentions:List<String>):List<File> {
         val list = ArrayList<File>()
@@ -109,7 +97,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         return list
     }
 
-    override fun scanTracks(type: Int): Either<None, List<Track>> {
+   /* override fun scanTracks(type: Int): Either<None, List<Track>> {
 
         val list = readRecursive(File("/storage/"), listOf("mp3", "wav")).sorted().map {
             Track(
@@ -126,7 +114,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         return Either.Right(list)
 
-    }
+    }*/
 
     override fun scanUSBTracks(path: String): Either<None, List<Track>> {
         val array = ArrayList<Track>()
@@ -241,12 +229,9 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!=0"
 
-        val selectionArgs =
-            arrayOf("%" + "/storage/usbdisk0" + "%", "%" + "/storage/usbdisk0" + "/%/%")
-        val order = MediaStore.Audio.Media.DATE_MODIFIED + " DESC"
-        var DOWNLOAD_FILE_DIR = "/storage/usbdisk0"
+
         //val selection= MediaStore.Audio.Media.IS_MUSIC + " != 0"
-        val cursor = context.getContentResolver().query(uri, null, selection, selectionArgs, order)
+        val cursor = context.getContentResolver().query(uri, null, selection, null, null)
 
         if (cursor != null) {
 
