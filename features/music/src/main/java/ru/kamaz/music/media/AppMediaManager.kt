@@ -19,9 +19,9 @@ import kotlin.random.Random
 class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
 
-    override fun scanTracks(type: Int): Either<None, List<Track>> {
+    override fun scanTracks(type:Int):Either<None, List<Track>> {
         val array = ArrayList<Track>()
-        val uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI
+        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -30,24 +30,19 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ALBUM
-        )
-        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
+        )
+
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC}  != 0"
         val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
 
-        val cursor = context.contentResolver.query(uri,
-            projection,
-            selection,
-            null,
-            sortOrder)
+        val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)
 
-
-        if (cursor != null) {
+        if(cursor != null) {
             cursor.moveToFirst()
 
-            while (!cursor.isAfterLast) {
-                val id =
-                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
+            while(!cursor.isAfterLast) {
+                val id = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
@@ -58,9 +53,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                         )
                     ).toLong()
                 )
-                val albumId =
-                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
-                        .toLong()
+                val albumId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)).toLong()
 
                 val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
 
@@ -83,7 +76,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         Log.i("trackList", "scanTracks: $array")
         return Either.Right(array)
     }
-
     fun readRecursive(root:File, extentions:List<String>):List<File> {
         val list = ArrayList<File>()
         root.listFiles()?.filter { it.isDirectory }?.forEach {
